@@ -1,0 +1,14 @@
+server:
+  port: 9092
+  servlet:
+    #jetty
+    contextPath: "/api/*"
+    #tomcat
+    context-path: "/api"
+
+spring:
+    profiles:
+        active: "@activatedProperties@"
+    info:
+        build:
+            encoding: UTF-8

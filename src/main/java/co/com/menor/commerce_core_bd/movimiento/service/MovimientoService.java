@@ -6,6 +6,7 @@ import co.com.menor.comun_dto.caja.request.SumaMovimientoCajaRequest;
 import co.com.menor.comun_dto.inventario.request.CreateMovimientoInventarioRequest;
 import co.com.menor.comun_dto.inventario.request.FiltroMovimientoInventarioRequest;
 import co.com.menor.comun_dto.inventario.response.MovimientoInventarioResponse;
+import co.com.menor.comun_dto.inventario.response.StockActualResponse;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -14,7 +15,9 @@ import org.springframework.data.domain.Page;
 
 public interface MovimientoService {
 
-    MovimientoInventario registrarMovimiento(CreateMovimientoInventarioRequest req);
+    MovimientoInventarioResponse registrarMovimiento(CreateMovimientoInventarioRequest req);
+
+    StockActualResponse consultarStock(Long productoId);
 
     Page<MovimientoInventarioResponse> obtenerMovimientosPaginados(
         FiltroMovimientoInventarioRequest filtro
@@ -23,6 +26,8 @@ public interface MovimientoService {
     MovimientoInventario guardarMovimiento(MovimientoInventario movimiento);
 
     Optional<MovimientoInventario> buscarPorId(Long movimientoId);
+
+    MovimientoInventarioResponse getMovimientoById(Long id);
 
     BigDecimal sumaMovimientosCaja(SumaMovimientoCajaRequest req);
 

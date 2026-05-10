@@ -19,10 +19,10 @@ public class StockActual {
     @Column(name = "producto_id")
     private Long productoId;
 
-    @Column(nullable = false, precision = 14, scale = 4)
+    @Column(nullable = false, precision = 14, scale = 2)
     private BigDecimal stock;
 
-    @Column(name = "costo_promedio", nullable = false, precision = 14, scale = 4)
+    @Column(name = "costo_promedio", nullable = false, precision = 14, scale = 2)
     private BigDecimal costoPromedio;
 
     @Column(name = "fecha_actualizacion", nullable = false)

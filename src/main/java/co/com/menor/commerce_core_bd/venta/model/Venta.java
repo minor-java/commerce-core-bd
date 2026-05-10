@@ -19,7 +19,7 @@ public class Venta {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "total")
+    @Column(name = "total", precision = 14, scale = 2)
     private BigDecimal total;
 
     @Column(name = "fecha_creacion", nullable = false)

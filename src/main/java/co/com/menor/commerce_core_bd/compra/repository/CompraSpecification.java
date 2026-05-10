@@ -28,8 +28,8 @@ public class CompraSpecification {
             if (filtro.getFechaHasta() != null) {
                 predicates.add(cb.lessThanOrEqualTo(root.get("fechaCreacion"), filtro.getFechaHasta()));
             }
-            if (filtro.getCreadoPor() != null) {
-                predicates.add(cb.equal(root.get("creadoPor"), filtro.getCreadoPor()));
+            if (filtro.getUsuarioId() != null) {
+                predicates.add(cb.equal(root.get("usuarioId"), filtro.getUsuarioId()));
             }
 
             return cb.and(predicates.toArray(new Predicate[0]));

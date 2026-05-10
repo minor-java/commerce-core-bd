@@ -7,6 +7,7 @@ import co.com.menor.comun_dto.caja.request.AbrirCajaRequest;
 import co.com.menor.comun_dto.caja.request.CerrarCajaRequest;
 import co.com.menor.comun_dto.caja.request.FiltroCajaRequest;
 import co.com.menor.comun_dto.caja.response.CajaResponse;
+import co.com.menor.comun_dto.utils.CajaConstants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -80,7 +81,7 @@ public class CajaServiceImpl implements CajaService {
 
         Caja caja = cajaRepository.findByUsuarioIdAndEstado(
             usuarioId,
-            "ABIERTA"
+            CajaConstants.ESTADO_ABIERTA
         ).orElse(null);
 
         return cajaMapper.toResponse(caja);
@@ -109,11 +110,11 @@ public class CajaServiceImpl implements CajaService {
                 );
             }
 
-            if (filtro.getCreadoPor() != null) {
+            if (filtro.getUsuarioId() != null) {
                 predicates.add(
                     cb.equal(
                         root.get("usuarioId"),
-                        filtro.getCreadoPor()
+                        filtro.getUsuarioId()
                     )
                 );
             }

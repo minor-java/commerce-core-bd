@@ -13,16 +13,16 @@ public class CodigoBarraResponseMapper {
 
     public CodigoBarraResponse toResponse(CodigoBarra codigoBarra) {
         return CodigoBarraResponse.builder()
-                .id(codigoBarra.getId())
-                .productoId(codigoBarra.getProductoId())
-                .codigo(codigoBarra.getCodigo())
-                .tipo(codigoBarra.getTipo())
-                .principal(codigoBarra.isPrincipal())
-                .fechaCreacion(codigoBarra.getFechaCreacion())
-                .fechaActualizacion(codigoBarra.getFechaActualizacion())
-                .creadoPor(codigoBarra.getCreadoPor())
-                .actualizadoPor(codigoBarra.getActualizadoPor())
-                .build();
+            .id(codigoBarra.getId())
+            .productoId(codigoBarra.getProductoId())
+            .codigo(codigoBarra.getCodigo())
+            .tipo(codigoBarra.getTipo())
+            .principal(codigoBarra.isPrincipal())
+            .fechaCreacion(codigoBarra.getFechaCreacion())
+            .fechaActualizacion(codigoBarra.getFechaActualizacion())
+            .usuarioId(codigoBarra.getUsuarioId())
+            .actualizadoPor(codigoBarra.getActualizadoPor())
+        .build();
     }
 
     public List<CodigoBarraResponse> toResponseList(List<CodigoBarra> codigosDeBarras) {

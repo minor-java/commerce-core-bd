@@ -22,10 +22,10 @@ public class Compra {
     @Column(name = "proveedor")
     private String proveedor;
 
-    @Column(name = "total")
+    @Column(name = "total", precision = 14, scale = 2)
     private BigDecimal total;
 
-    @Column(name = "observacion")
+    @Column(name = "observacion", length = 500)
     private String observacion;
 
     @Column(name = "fecha_creacion", nullable = false)

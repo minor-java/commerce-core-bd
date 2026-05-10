@@ -12,6 +12,7 @@ import co.com.menor.comun_dto.compra.request.CompraRequest;
 import co.com.menor.comun_dto.compra.request.FiltroCompraRequest;
 import co.com.menor.comun_dto.compra.response.CompraResponse;
 import co.com.menor.comun_dto.inventario.request.CreateMovimientoInventarioRequest;
+import co.com.menor.comun_dto.utils.MovimientoInventarioConstants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -62,10 +63,10 @@ public class CompraServiceImpl implements CompraService {
             detallesGuardados.forEach(detalle -> {
                 CreateMovimientoInventarioRequest movReq = new CreateMovimientoInventarioRequest();
                 movReq.setProductoId(detalle.getProductoId());
-                movReq.setTipo("ENTRADA");
+                movReq.setTipo(MovimientoInventarioConstants.TIPO_ENTRADA);
                 movReq.setCantidad(detalle.getCantidad());
                 movReq.setCostoUnitario(detalle.getCostoUnitario());
-                movReq.setReferenciaTipo("COMPRA_DETALLE");
+                movReq.setReferenciaTipo(MovimientoInventarioConstants.REFERENCIA_COMPRA_DETALLE);
                 movReq.setReferenciaId(detalle.getId());
                 movReq.setUsuarioId(req.getUsuarioId());
     

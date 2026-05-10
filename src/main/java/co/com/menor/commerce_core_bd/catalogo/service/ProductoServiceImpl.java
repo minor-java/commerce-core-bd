@@ -236,7 +236,7 @@ public class ProductoServiceImpl implements ProductoService {
         } catch (Exception e) {
             throw new MinorExcepcion(
                 "ERROR",
-            "ProductoService deleteById"
+            "ProductoService updateProducto"
             );
         }
     }

@@ -5,6 +5,7 @@ import co.com.menor.commerce_core_bd.caja.model.MovimientoCaja;
 import co.com.menor.comun_dto.caja.request.AbrirCajaRequest;
 import co.com.menor.comun_dto.caja.response.CajaResponse;
 import co.com.menor.comun_dto.caja.response.MovimientoCajaResponse;
+import co.com.menor.comun_dto.utils.CajaConstants;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -22,7 +23,7 @@ public class CajaMapper {
         caja.setMontoInicial(req.getMontoInicial());
         caja.setTotalIngresos(BigDecimal.ZERO);
         caja.setTotalEgresos(BigDecimal.ZERO);
-        caja.setEstado("ABIERTA");
+        caja.setEstado(CajaConstants.ESTADO_ABIERTA);
         caja.setFechaApertura(LocalDateTime.now());
         caja.setUsuarioId(req.getUsuarioId());
 

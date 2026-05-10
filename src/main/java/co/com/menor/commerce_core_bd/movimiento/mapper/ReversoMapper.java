@@ -16,7 +16,7 @@ public class ReversoMapper {
         reverso.setMovimientoId(req.getMovimientoId());
         reverso.setCantidadReversada(req.getCantidadReversada());
         reverso.setObservacion(req.getObservacion());
-        reverso.setCreadoPor(req.getUsuarioId());
+        reverso.setUsuarioId(req.getUsuarioId());
         reverso.setFechaCreacion(LocalDateTime.now());
         return reverso;
     }
@@ -29,7 +29,7 @@ public class ReversoMapper {
             .cantidadReversada(entity.getCantidadReversada())
             .observacion(entity.getObservacion())
             .fechaCreacion(entity.getFechaCreacion())
-            .creadoPor(entity.getCreadoPor())
+            .usuarioId(entity.getUsuarioId())
         .build();
     }
 }

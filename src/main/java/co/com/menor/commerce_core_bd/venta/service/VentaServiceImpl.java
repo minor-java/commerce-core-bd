@@ -3,8 +3,6 @@ package co.com.menor.commerce_core_bd.venta.service;
 import co.com.menor.commerce_core_bd.caja.model.MovimientoCaja;
 import co.com.menor.commerce_core_bd.caja.service.CajaService;
 import co.com.menor.commerce_core_bd.movimiento.model.MovimientoInventario;
-import co.com.menor.commerce_core_bd.movimiento.model.StockActual;
-import co.com.menor.commerce_core_bd.movimiento.repository.MovimientoCajaRepository;
 import co.com.menor.commerce_core_bd.movimiento.service.MovimientoService;
 import co.com.menor.commerce_core_bd.movimiento.service.StockActualService;
 import co.com.menor.commerce_core_bd.shared.exception.MinorExcepcion;
@@ -13,7 +11,8 @@ import co.com.menor.commerce_core_bd.venta.mapper.VentaResponseMapper;
 import co.com.menor.commerce_core_bd.venta.model.Venta;
 import co.com.menor.commerce_core_bd.venta.model.VentaDetalle;
 import co.com.menor.commerce_core_bd.venta.repository.VentaRepository;
-import co.com.menor.comun_dto.caja.response.CajaResponse;
+import co.com.menor.comun_dto.utils.CajaConstants;
+import co.com.menor.comun_dto.utils.MovimientoInventarioConstants;
 import co.com.menor.comun_dto.venta.request.FiltroVentaRequest;
 import co.com.menor.comun_dto.venta.request.VentaRequest;
 import co.com.menor.comun_dto.venta.response.VentaResponse;
@@ -28,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -41,48 +39,15 @@ public class VentaServiceImpl implements VentaService {
     
     private final MovimientoService movimientoService;
     
-    // private final MovimientoCajaRepository movimientoCajaRepository;
-    
     private final VentaMapper ventaMapper;
     private final VentaResponseMapper ventaResponseMapper;
     
     private final StockActualService stockActualService;
-    private final CajaService cajaService;
 
     @Override
     @Transactional
     public VentaResponse crearVenta(VentaRequest req) {
         
-        // if (req == null) {
-        //     throw new MinorExcepcion("REQUEST_NULO", "El cuerpo de la solicitud es obligatorio");
-        // }
-        // if (req.getDetalles() == null || req.getDetalles().isEmpty()) {
-        //     throw new MinorExcepcion("DETALLES_REQUERIDOS", "La venta debe contener al menos un detalle");
-        // }
-        // if (req.getMetodoPago() == null || req.getMetodoPago().trim().isEmpty()) {
-        //     throw new MinorExcepcion("METODO_PAGO_REQUERIDO", "El método de pago es obligatorio");
-        // }
-
-        // CajaResponse cajaAbierta = cajaService.obtenerPorUsuarioId(req.getUsuarioId());
-
-        // req.getDetalles().forEach(d -> {
-           
-        //     Optional<StockActual> stockOpt = 
-        //     stockActualService.buscarPorProductoId(d.getProductoId());
-
-        //     BigDecimal stockDisponible = stockOpt.map(s -> s.getStock()).orElse(BigDecimal.ZERO);
-            
-        //     if (stockDisponible.compareTo(d.getCantidad()) < 0) {
-
-        //         log.error("El producto no tiene stock disponible: ", d.getProductoId());
-
-        //         throw new MinorExcepcion(
-        //             "ERROR",
-        //             "VentaService crearVenta"
-        //         );
-        //     }
-        // });
-
         Venta venta = ventaMapper.toEntity(req);
         Venta ventaGuardada = ventaRepository.save(venta);
         log.info("crearVenta: venta guardada id={}", ventaGuardada.getId());
@@ -104,11 +69,11 @@ public class VentaServiceImpl implements VentaService {
             MovimientoInventario movimiento = new MovimientoInventario();
 
             movimiento.setProductoId(detalle.getProductoId());
-            movimiento.setTipo("SALIDA");
+            movimiento.setTipo(MovimientoInventarioConstants.TIPO_SALIDA);
             movimiento.setCantidad(detalle.getCantidad());
             movimiento.setCostoUnitario(costoUnitario);
             movimiento.setCostoTotal(detalle.getCantidad().multiply(costoUnitario));
-            movimiento.setReferenciaTipo("VENTA_DETALLE");
+            movimiento.setReferenciaTipo(MovimientoInventarioConstants.REFERENCIA_VENTA_DETALLE);
             movimiento.setReferenciaId(detalle.getId());
             movimiento.setFechaCreacion(LocalDateTime.now());
             movimiento.setUsuarioId(req.getUsuarioId());
@@ -126,10 +91,10 @@ public class VentaServiceImpl implements VentaService {
 
         MovimientoCaja movCaja = new MovimientoCaja();
         movCaja.setCajaId(req.getCajaId());
-        movCaja.setTipo("INGRESO");
+        movCaja.setTipo(CajaConstants.TIPO_INGRESO);
         movCaja.setMetodoPago(req.getMetodoPago());
         movCaja.setMonto(total);
-        movCaja.setReferenciaTipo("VENTA");
+        movCaja.setReferenciaTipo(MovimientoInventarioConstants.REFERENCIA_VENTA);
         movCaja.setReferenciaId(ventaGuardada.getId());
         movCaja.setFechaCreacion(LocalDateTime.now());
         movCaja.setUsuarioId(req.getUsuarioId());
@@ -165,8 +130,8 @@ public class VentaServiceImpl implements VentaService {
     private Specification<Venta> buildSpec(FiltroVentaRequest filtro) {
         return (root, query, cb) -> {
             java.util.List<javax.persistence.criteria.Predicate> predicates = new java.util.ArrayList<>();
-            if (filtro.getCreadoPor() != null) {
-                predicates.add(cb.equal(root.get("creadoPor"), filtro.getCreadoPor()));
+            if (filtro.getUsuarioId() != null) {
+                predicates.add(cb.equal(root.get("usuarioId"), filtro.getUsuarioId()));
             }
             if (filtro.getFechaDesde() != null) {
                 predicates.add(cb.greaterThanOrEqualTo(root.get("fechaCreacion"), filtro.getFechaDesde()));

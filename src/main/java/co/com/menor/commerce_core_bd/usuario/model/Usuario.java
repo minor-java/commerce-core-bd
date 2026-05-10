@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
  *
  * @author jeffry
  */
-@Table(name = "USUARIOS")
+@Table(name = "USUARIO")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

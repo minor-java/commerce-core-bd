@@ -10,5 +10,5 @@ import java.util.Optional;
 @Repository
 public interface CajaRepository extends JpaRepository<Caja, Long>, JpaSpecificationExecutor<Caja> {
 
-    Optional<Caja> findByUsuarioIdAndEstado(Long creadoPor, String estado);
+    Optional<Caja> findByUsuarioIdAndEstado(Long usuarioId, String estado);
 }

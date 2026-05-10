@@ -11,6 +11,7 @@ import co.com.menor.comun_dto.caja.request.SumaMovimientoCajaRequest;
 import co.com.menor.comun_dto.inventario.request.CreateMovimientoInventarioRequest;
 import co.com.menor.comun_dto.inventario.request.FiltroMovimientoInventarioRequest;
 import co.com.menor.comun_dto.inventario.response.MovimientoInventarioResponse;
+import co.com.menor.comun_dto.inventario.response.StockActualResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import lombok.RequiredArgsConstructor;
@@ -47,8 +48,19 @@ public class MovimientoServiceImpl implements MovimientoService {
     }
 
     @Override
+    public MovimientoInventarioResponse getMovimientoById(Long id) {
+
+        return movimientoRepository.findById(id)
+            .map(movimientoInventarioMapper::toResponse)
+            .orElseThrow(() -> new MinorExcepcion(
+                "MOVIMIENTO_NO_ENCONTRADO",
+                "No existe un movimiento con id " + id
+            ));
+    }
+
+    @Override
     @Transactional
-    public MovimientoInventario registrarMovimiento(CreateMovimientoInventarioRequest req) {
+    public MovimientoInventarioResponse registrarMovimiento(CreateMovimientoInventarioRequest req) {
 
         try {
             
@@ -64,7 +76,7 @@ public class MovimientoServiceImpl implements MovimientoService {
             );
     
             stockActualService.actualizarStock(saved);
-            return saved;
+            return movimientoInventarioMapper.toResponse(saved);
 
         } catch (Exception e) {
             throw new MinorExcepcion(
@@ -81,11 +93,15 @@ public class MovimientoServiceImpl implements MovimientoService {
     ) {
 
         try {
-            
+
+            if (filtro == null) {
+                filtro = new FiltroMovimientoInventarioRequest();
+            }
+
             PageRequest pageable = PageRequest.of(filtro.getPage(), filtro.getSize());
-            
+
             Page<MovimientoInventario> page = movimientoRepository.findAll(
-                MovimientoInventarioSpecification.buildFrom(filtro), 
+                MovimientoInventarioSpecification.buildFrom(filtro),
                 pageable
             );
     
@@ -139,7 +155,7 @@ public class MovimientoServiceImpl implements MovimientoService {
     public MovimientoCaja guardarMovimientoCaja(MovimientoCaja movCaja) {
 
         try {
-            
+
             return movimientoCajaRepository
             .save(movCaja);
         } catch (Exception e) {
@@ -148,5 +164,18 @@ public class MovimientoServiceImpl implements MovimientoService {
                 "MovimientoService guardarmovimientoCaja"
             );
         }
+    }
+
+    @Override
+    public StockActualResponse consultarStock(Long productoId) {
+
+        return stockActualService.buscarPorProductoId(productoId)
+            .map(s -> new StockActualResponse(
+                s.getProductoId(),
+                s.getStock(),
+                s.getCostoPromedio(),
+                s.getFechaActualizacion()
+            ))
+            .orElse(new StockActualResponse(productoId, BigDecimal.ZERO, BigDecimal.ZERO, null));
     }
 }

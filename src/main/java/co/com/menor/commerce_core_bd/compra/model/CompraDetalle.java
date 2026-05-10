@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "COMPRA_DETALLE")
@@ -25,24 +24,15 @@ public class CompraDetalle {
     @Column(name = "producto_id", nullable = false)
     private Long productoId;
 
-    @Column(name = "cantidad", nullable = false)
+    @Column(name = "cantidad", nullable = false, precision = 14, scale = 2)
     private BigDecimal cantidad;
 
-    @Column(name = "costo_unitario", nullable = false)
+    @Column(name = "costo_unitario", nullable = false, precision = 14, scale = 2)
     private BigDecimal costoUnitario;
 
-    @Column(name = "subtotal")
+    @Column(name = "subtotal", precision = 14, scale = 2)
     private BigDecimal subtotal;
-
-    @Column(name = "fecha_creacion", nullable = false)
-    private LocalDateTime fechaCreacion;
-
-    @Column(name = "fecha_actualizacion")
-    private LocalDateTime fechaActualizacion;
 
     @Column(name = "usuario_id", nullable = false)
     private Long usuarioId;
-
-    @Column(name = "actualizado_por")
-    private Long actualizadoPor;
 }

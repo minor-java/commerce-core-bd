@@ -9,7 +9,14 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "MOVIMIENTO_INVENTARIO")
+@Table(
+    name = "MOVIMIENTO_INVENTARIO",
+    indexes = {
+        @javax.persistence.Index(name = "idx_mov_referencia", columnList = "referencia_tipo, referencia_id"),
+        @javax.persistence.Index(name = "idx_mov_producto_fecha", columnList = "producto_id, fecha_creacion"),
+        @javax.persistence.Index(name = "idx_mov_origen", columnList = "movimiento_origen_id")
+    }
+)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,10 +32,10 @@ public class MovimientoInventario {
     @Column(nullable = false, length = 20)
     private String tipo;
 
-    @Column(nullable = false, precision = 14, scale = 4)
+    @Column(nullable = false, precision = 14, scale = 2)
     private BigDecimal cantidad;
 
-    @Column(name = "costo_unitario", nullable = false, precision = 14, scale = 4)
+    @Column(name = "costo_unitario", nullable = false, precision = 14, scale = 2)
     private BigDecimal costoUnitario;
 
     @Column(name = "costo_total", precision = 14, scale = 2)

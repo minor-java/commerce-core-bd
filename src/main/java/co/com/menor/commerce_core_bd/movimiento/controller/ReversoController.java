@@ -1,5 +1,7 @@
 package co.com.menor.commerce_core_bd.movimiento.controller;
 
+import java.math.BigDecimal;
+
 import co.com.menor.commerce_core_bd.movimiento.service.ReversoService;
 import co.com.menor.comun_dto.reverso.request.ReversoRequest;
 import co.com.menor.comun_dto.reverso.response.ReversoResponse;
@@ -20,5 +22,10 @@ public class ReversoController {
         return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(reversoService.crearReverso(request));
+    }
+
+    @GetMapping("/cantidad-reversada/{movimientoId}")
+    public ResponseEntity<BigDecimal> getCantidadReversada(@PathVariable Long movimientoId) {
+        return ResponseEntity.ok(reversoService.getCantidadReversada(movimientoId));
     }
 }

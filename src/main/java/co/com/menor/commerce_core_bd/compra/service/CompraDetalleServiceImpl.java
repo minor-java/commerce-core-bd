@@ -45,7 +45,7 @@ public class CompraDetalleServiceImpl implements CompreDetalleService {
             List<CompraDetalle> detalles =
             compraDetalleRepository.findByCompraId(compraId);
 
-        return compraDetalleMapper.toDetalleResponseList(detalles);
+            return compraDetalleMapper.toDetalleResponseList(detalles);
 
         } catch (Exception e) {
 

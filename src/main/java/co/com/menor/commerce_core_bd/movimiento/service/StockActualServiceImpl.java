@@ -11,6 +11,7 @@ import co.com.menor.commerce_core_bd.movimiento.model.MovimientoInventario;
 import co.com.menor.commerce_core_bd.movimiento.model.StockActual;
 import co.com.menor.commerce_core_bd.movimiento.repository.StockActualRepository;
 import co.com.menor.commerce_core_bd.shared.exception.MinorExcepcion;
+import co.com.menor.comun_dto.utils.MovimientoInventarioConstants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,9 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 public class StockActualServiceImpl implements StockActualService {
-
-    private static final String TIPO_SALIDA = "SALIDA";
-    private static final String REFERENCIA_COMPRA_DETALLE = "COMPRA_DETALLE";
 
     private final StockActualRepository stockActualRepository;
 
@@ -38,14 +36,14 @@ public class StockActualServiceImpl implements StockActualService {
     
                 stock = stockOpt.get();
     
-                if (TIPO_SALIDA.equalsIgnoreCase(movimiento.getTipo())) {
+                if (MovimientoInventarioConstants.TIPO_SALIDA.equalsIgnoreCase(movimiento.getTipo())) {
                     
                     stock.setStock(stock.getStock().subtract(movimiento.getCantidad()));
                 } else {
                     
                     BigDecimal nuevoStock = stock.getStock().add(movimiento.getCantidad());
                     // Solo recalcular costo promedio en entradas por compra
-                    if (REFERENCIA_COMPRA_DETALLE.equalsIgnoreCase(movimiento.getReferenciaTipo())) {
+                    if (MovimientoInventarioConstants.REFERENCIA_COMPRA_DETALLE.equalsIgnoreCase(movimiento.getReferenciaTipo())) {
                         
                         BigDecimal costoActual = stock
                             .getStock()
@@ -70,7 +68,7 @@ public class StockActualServiceImpl implements StockActualService {
                 stock = new StockActual();
                 stock.setProductoId(movimiento.getProductoId());
     
-                BigDecimal stockInicial = TIPO_SALIDA.equalsIgnoreCase(movimiento.getTipo())
+                BigDecimal stockInicial = MovimientoInventarioConstants.TIPO_SALIDA.equalsIgnoreCase(movimiento.getTipo())
                         ? movimiento.getCantidad().negate()
                         : movimiento.getCantidad();
     

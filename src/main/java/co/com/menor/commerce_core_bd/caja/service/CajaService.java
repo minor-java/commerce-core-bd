@@ -4,6 +4,7 @@ import co.com.menor.comun_dto.caja.request.AbrirCajaRequest;
 import co.com.menor.comun_dto.caja.request.CerrarCajaRequest;
 import co.com.menor.comun_dto.caja.request.FiltroCajaRequest;
 import co.com.menor.comun_dto.caja.response.CajaResponse;
+
 import org.springframework.data.domain.Page;
 
 public interface CajaService {
@@ -12,9 +13,10 @@ public interface CajaService {
 
     CajaResponse cerrarCaja(CerrarCajaRequest req);
 
-    CajaResponse obtenerPorId(Long id);
+    CajaResponse obtenerPorCajaId(Long id);
 
-    CajaResponse obtenerCajaAbierta(Long usuarioId);
+    CajaResponse obtenerPorUsuarioId(Long usuarioId);
 
     Page<CajaResponse> buscarPaginado(FiltroCajaRequest filtro);
+    
 }

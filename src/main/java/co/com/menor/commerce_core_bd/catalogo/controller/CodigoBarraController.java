@@ -1,6 +1,7 @@
 package co.com.menor.commerce_core_bd.catalogo.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,24 +37,18 @@ public class CodigoBarraController {
 
         CodigoBarra guardado = codigoBarrasService.saveCodigoBarras(codigoBarras);
 
-        if (guardado != null) {
-            return ResponseEntity
-                .status(HttpStatus.ACCEPTED)
-                .body(codigoBarraResponseMapper.toResponse(guardado));
-        }
-
         return ResponseEntity
-            .status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .build();
+        .status(HttpStatus.ACCEPTED)
+        .body(codigoBarraResponseMapper.toResponse(guardado));
     }
 
     @GetMapping("/existe-codigo-barras/{codigoBarras}")
     public ResponseEntity<Boolean> existeUsuario(
         @PathVariable String codigoBarras
     ) {
-
-        boolean existe = codigoBarrasService.existsCodigoBarras(codigoBarras);
-        return ResponseEntity.ok(existe);
+        return ResponseEntity.ok(
+            codigoBarrasService.existsCodigoBarras(codigoBarras)
+        );
     }
 
     @GetMapping("/consulta-por-codigo-barras/{codigo}")
@@ -61,9 +56,12 @@ public class CodigoBarraController {
         @PathVariable String codigo
     ) {
 
-        return codigoBarrasService.findByCodigo(codigo)
-            .map(cb -> ResponseEntity.ok(codigoBarraResponseMapper.toResponse(cb)))
-            .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+        CodigoBarra guardado = codigoBarrasService.findByCodigo(codigo).get();
+
+        return ResponseEntity
+        .status(HttpStatus.ACCEPTED)
+        .body(codigoBarraResponseMapper.toResponse(guardado));
+
     }
 
     @GetMapping("/consulta-por-producto-id/{id}")
@@ -71,13 +69,11 @@ public class CodigoBarraController {
         @PathVariable Long id
     ) {
 
-        List<CodigoBarra> codigosDeBarras = codigoBarrasService.findByProductoId(id);
-
-        if (codigosDeBarras.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-
-        return ResponseEntity.ok(codigoBarraResponseMapper.toResponseList(codigosDeBarras));
+        return ResponseEntity.ok(
+            codigoBarraResponseMapper.toResponseList(
+                codigoBarrasService.findByProductoId(id)
+            )
+        );
     }
 
     @DeleteMapping("/delete-by-id/{id}")

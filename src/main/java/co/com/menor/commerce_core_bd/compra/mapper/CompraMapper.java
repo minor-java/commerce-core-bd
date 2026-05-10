@@ -1,12 +1,14 @@
 package co.com.menor.commerce_core_bd.compra.mapper;
 
 import co.com.menor.commerce_core_bd.compra.model.Compra;
-import co.com.menor.commerce_core_bd.compra.model.CompraDetalle;
-import co.com.menor.comun_dto.compra.request.CompraDetalleRequest;
 import co.com.menor.comun_dto.compra.request.CompraRequest;
+import co.com.menor.comun_dto.compra.response.CompraDetalleResponse;
+import co.com.menor.comun_dto.compra.response.CompraResponse;
+
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Component
 public class CompraMapper {
@@ -15,20 +17,38 @@ public class CompraMapper {
         Compra compra = new Compra();
         compra.setProveedor(req.getProveedor());
         compra.setObservacion(req.getObservacion());
-        compra.setCreadoPor(req.getCreadoPor());
+        compra.setUsuarioId(req.getUsuarioId());
         compra.setFechaCreacion(LocalDateTime.now());
         return compra;
     }
 
-    public CompraDetalle toDetalleEntity(CompraDetalleRequest req, Long compraId, Long creadoPor) {
-        CompraDetalle detalle = new CompraDetalle();
-        detalle.setCompraId(compraId);
-        detalle.setProductoId(req.getProductoId());
-        detalle.setCantidad(req.getCantidad());
-        detalle.setCostoUnitario(req.getCostoUnitario());
-        detalle.setSubtotal(req.getCantidad().multiply(req.getCostoUnitario()));
-        detalle.setCreadoPor(creadoPor);
-        detalle.setFechaCreacion(LocalDateTime.now());
-        return detalle;
+    public CompraResponse toResponse(
+        Compra compra,
+        List<CompraDetalleResponse> detalles
+    ) {
+
+        return new CompraResponse(
+            compra.getId(),
+            compra.getProveedor(),
+            compra.getTotal(),
+            compra.getObservacion(),
+            compra.getFechaCreacion(),
+            compra.getUsuarioId(),
+            detalles
+        );
     }
+
+    public CompraResponse toResponse(Compra compra) {
+
+        return new CompraResponse(
+            compra.getId(),
+            compra.getProveedor(),
+            compra.getTotal(),
+            compra.getObservacion(),
+            compra.getFechaCreacion(),
+            compra.getUsuarioId(),
+            null
+        );
+    }
+
 }

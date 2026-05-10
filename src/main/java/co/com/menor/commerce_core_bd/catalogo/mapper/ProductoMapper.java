@@ -22,7 +22,7 @@ public class ProductoMapper {
         producto.setPresentacionUnidad(req.getPresentacionUnidad());
         producto.setActivo(req.isActivo());
         producto.setFechaCreacion(req.getFechaCreacion());
-        producto.setCreadoPor(req.getCreadoPor());
+        producto.setUsuarioId(req.getUsuarioId());
         producto.setPrecioVenta(req.getPrecioVenta());
 
         return producto;

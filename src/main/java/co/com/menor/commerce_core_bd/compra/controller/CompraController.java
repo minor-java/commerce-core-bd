@@ -1,58 +1,61 @@
 package co.com.menor.commerce_core_bd.compra.controller;
 
 import co.com.menor.commerce_core_bd.compra.service.CompraService;
+import co.com.menor.commerce_core_bd.compra.service.CompreDetalleService;
 import co.com.menor.comun_dto.compra.request.CompraRequest;
 import co.com.menor.comun_dto.compra.request.FiltroCompraRequest;
-import co.com.menor.comun_dto.compra.response.CompraDetalleByIdResponse;
+import co.com.menor.comun_dto.compra.response.CompraDetalleResponse;
 import co.com.menor.comun_dto.compra.response.CompraResponse;
 import co.com.menor.comun_dto.paginacion.PaginadoResponse;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/compras")
+@RequestMapping("/compra")
 @RequiredArgsConstructor
 public class CompraController {
 
     private final CompraService compraService;
+    private final CompreDetalleService compreDetalleService;
 
     @PostMapping
     public ResponseEntity<CompraResponse> crear(@RequestBody CompraRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(compraService.crearCompra(request));
+        return ResponseEntity
+        .status(HttpStatus.CREATED)
+        .body(compraService.crearCompra(request));
     }
 
-    @GetMapping
-    public ResponseEntity<List<CompraResponse>> obtenerTodas() {
-        return ResponseEntity.ok(compraService.obtenerTodas());
-    }
-
-    @PostMapping("/detalladas")
+    @PostMapping("/paginado")
     public ResponseEntity<PaginadoResponse<CompraResponse>> buscarDetalladas(
-            @RequestBody FiltroCompraRequest filtro) {
-        Page<CompraResponse> page = compraService.buscarDetalladas(filtro);
+        @RequestBody FiltroCompraRequest filtro
+    ) {
+
+        Page<CompraResponse> page = compraService.buscarComprasPaginado(filtro);
+
         PaginadoResponse<CompraResponse> respuesta = new PaginadoResponse<>(
-                page.getContent(),
-                page.getTotalElements(),
-                page.getNumber(),
-                page.getSize(),
-                page.getTotalPages()
+            page.getContent(),
+            page.getTotalElements(),
+            page.getNumber(),
+            page.getSize(),
+            page.getTotalPages()
         );
+
         return ResponseEntity.ok(respuesta);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<CompraResponse> obtenerPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(compraService.obtenerPorId(id));
-    }
+    @GetMapping("/consulta-detalle-por-producto-id/{id}")
+    public ResponseEntity<List<CompraDetalleResponse>> buscarPorNombre(
+        @PathVariable Long id
+    ) {
 
-    @GetMapping("/detalle-by-id/{id}")
-    public ResponseEntity<CompraDetalleByIdResponse> obtenerDetallePorId(@PathVariable Long id) {
-        return ResponseEntity.ok(compraService.obtenerDetallePorId(id));
+        return ResponseEntity.ok(
+            compreDetalleService.obtenerDetallesPorCompraId(id)
+        );
     }
-
 }

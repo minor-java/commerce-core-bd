@@ -1,6 +1,6 @@
-package co.com.menor.commerce_core_bd.inventario.mapper;
+package co.com.menor.commerce_core_bd.movimiento.mapper;
 
-import co.com.menor.commerce_core_bd.inventario.model.Reverso;
+import co.com.menor.commerce_core_bd.movimiento.model.Reverso;
 import co.com.menor.comun_dto.reverso.request.ReversoRequest;
 import co.com.menor.comun_dto.reverso.response.ReversoResponse;
 import org.springframework.stereotype.Component;
@@ -16,7 +16,7 @@ public class ReversoMapper {
         reverso.setMovimientoId(req.getMovimientoId());
         reverso.setCantidadReversada(req.getCantidadReversada());
         reverso.setObservacion(req.getObservacion());
-        reverso.setCreadoPor(req.getCreadoPor());
+        reverso.setCreadoPor(req.getUsuarioId());
         reverso.setFechaCreacion(LocalDateTime.now());
         return reverso;
     }
@@ -24,12 +24,12 @@ public class ReversoMapper {
     public ReversoResponse toResponse(Reverso entity) {
         if (entity == null) return null;
         return ReversoResponse.builder()
-                .id(entity.getId())
-                .movimientoId(entity.getMovimientoId())
-                .cantidadReversada(entity.getCantidadReversada())
-                .observacion(entity.getObservacion())
-                .fechaCreacion(entity.getFechaCreacion())
-                .creadoPor(entity.getCreadoPor())
-                .build();
+            .id(entity.getId())
+            .movimientoId(entity.getMovimientoId())
+            .cantidadReversada(entity.getCantidadReversada())
+            .observacion(entity.getObservacion())
+            .fechaCreacion(entity.getFechaCreacion())
+            .creadoPor(entity.getCreadoPor())
+        .build();
     }
 }

@@ -25,6 +25,6 @@ public class Venta {
     @Column(name = "fecha_creacion", nullable = false)
     private LocalDateTime fechaCreacion;
 
-    @Column(name = "creado_por", nullable = false)
-    private Long creadoPor;
+    @Column(name = "usuario_id", nullable = false)
+    private Long usuarioId;
 }

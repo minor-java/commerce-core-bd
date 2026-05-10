@@ -1,10 +1,11 @@
-package co.com.menor.commerce_core_bd.inventario.repository;
+package co.com.menor.commerce_core_bd.movimiento.repository;
 
-import co.com.menor.commerce_core_bd.inventario.model.Reverso;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import co.com.menor.commerce_core_bd.movimiento.model.Reverso;
 
 import java.math.BigDecimal;
 import java.util.List;

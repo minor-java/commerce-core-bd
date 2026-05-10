@@ -45,8 +45,8 @@ public class Producto {
     @Column(name = "fecha_actualizacion", nullable = true)
     private LocalDateTime fechaActualizacion;
 
-    @Column(name = "creado_por", nullable = false)
-    private Long creadoPor;
+    @Column(name = "usuario_id", nullable = false)
+    private Long usuarioId;
     
     @Column(name = "actualizado_por", nullable = true)
     private Long actualizadoPor;

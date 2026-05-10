@@ -23,6 +23,7 @@ import co.com.menor.commerce_core_bd.catalogo.repository.CodigoBarraRepository;
 import co.com.menor.commerce_core_bd.catalogo.repository.PrecioHistoricoRepository;
 import co.com.menor.commerce_core_bd.catalogo.repository.ProductoRepository;
 import co.com.menor.commerce_core_bd.catalogo.repository.ProductoSpecification;
+import co.com.menor.commerce_core_bd.shared.exception.MinorExcepcion;
 import co.com.menor.comun_dto.codigo_barras.request.CreateCondigoBarrasRequest;
 import co.com.menor.comun_dto.producto.request.CreateProductoRequest;
 import co.com.menor.comun_dto.producto.request.ExistsProductoRequest;
@@ -52,123 +53,191 @@ public class ProductoServiceImpl implements ProductoService {
     @Override
     public Optional<Producto> findById(Long productoId) {
 
-        if (productoId == null) {
-            return Optional.empty();
+        try {
+            
+            return productoRepository.findById(productoId);
+        } catch (Exception e) {
+            throw new MinorExcepcion(
+                "ERROR",
+                "ProductoService findById"
+            );
         }
-
-        return productoRepository.findById(productoId);
     }
 
     @Override
     public List<Producto> findByLikeNombre(String nombre) {
 
-        if (nombre == null || nombre.trim().isEmpty()) {
-            return Collections.emptyList();
+        try {
+            
+            return productoRepository.findByNombreContainingIgnoreCase(nombre);
+        } catch (Exception e) {
+            throw new MinorExcepcion(
+                "ERROR",
+                "ProductoService findByLikeNombre"
+            );
         }
-        return productoRepository.findByNombreContainingIgnoreCase(nombre);
     }
 
     @Override
     public List<Producto> allProductos() {
-        return productoRepository.findAll();
+
+        try {
+            
+            return productoRepository.findAll();
+        } catch (Exception e) {
+            throw new MinorExcepcion(
+                "ERROR",
+                "ProductoService allProductos"
+            );
+        }
     }
 
     @Override
     public boolean existsProducto(ExistsProductoRequest existsProductoRequest) {
-
-        if (existsProductoRequest == null) {
-            return false;
+        
+        try {
+            
+            return productoRepository.existsByNombreAndPresentacionValorAndPresentacionUnidad(
+                existsProductoRequest.getNombre(),
+                existsProductoRequest.getPresentacionValor(),
+                existsProductoRequest.getPresentacionUnidad()
+            );
+        } catch (Exception e) {
+            
+            throw new MinorExcepcion(
+                "ERROR",
+                "ProductoService existsProducto"
+            );
         }
-
-        return productoRepository.existsByNombreAndPresentacionValorAndPresentacionUnidad(
-            existsProductoRequest.getNombre(),
-            existsProductoRequest.getPresentacionValor(),
-            existsProductoRequest.getPresentacionUnidad()
-        );
     }
 
     @Override
     @Transactional
     public ProductoConCodigos saveProducto(CreateProductoRequest req) {
 
-        Producto productoModel = productoMapper.toEntity(req);
-        productoModel.setId(null);
-        Producto productoGuardado = productoRepository.save(productoModel);
-
-        List<CodigoBarra> codigosGuardados = Collections.emptyList();
-
-        if (req.getCodigos() != null && !req.getCodigos().isEmpty()) {
-            codigosGuardados = req.getCodigos().stream()
-                .map(codigoReq -> guardarCodigo(codigoReq, productoGuardado.getId()))
-                .collect(Collectors.toList());
+        try {
+            
+            Producto productoModel = productoMapper.toEntity(req);
+            productoModel.setId(null);
+            Producto productoGuardado = productoRepository.save(productoModel);
+    
+            List<CodigoBarra> codigosGuardados = Collections.emptyList();
+    
+            if (req.getCodigos() != null && !req.getCodigos().isEmpty()) {
+                codigosGuardados = req.getCodigos().stream()
+                    .map(codigoReq -> guardarCodigo(codigoReq, productoGuardado.getId()))
+                    .collect(Collectors.toList());
+            }
+    
+            if (productoGuardado.getPrecioVenta() != null) {
+                precioHistoricoRepository.save(PrecioHistorico.builder()
+                    .productoId(productoGuardado.getId())
+                    .precioAnterior(null)
+                    .precioNuevo(productoGuardado.getPrecioVenta())
+                    .fechaCreacion(productoGuardado.getFechaCreacion())
+                    .usuarioId(productoGuardado.getUsuarioId())
+                .build());
+            }
+    
+            return new ProductoConCodigos(productoGuardado, codigosGuardados);
+        } catch (Exception e) {
+            throw new MinorExcepcion(
+                "ERROR",
+                "ProductoService saveProducto"
+            );
         }
-
-        if (productoGuardado.getPrecioVenta() != null) {
-            precioHistoricoRepository.save(PrecioHistorico.builder()
-                .productoId(productoGuardado.getId())
-                .precioAnterior(null)
-                .precioNuevo(productoGuardado.getPrecioVenta())
-                .fechaCreacion(productoGuardado.getFechaCreacion())
-                .creadoPor(productoGuardado.getCreadoPor())
-            .build());
-        }
-
-        return new ProductoConCodigos(productoGuardado, codigosGuardados);
     }
 
-    private CodigoBarra guardarCodigo(CreateCondigoBarrasRequest codigoReq, Long productoId) {
-        CodigoBarra codigoBarra = codigoBarraMapper.toEntity(codigoReq);
-        codigoBarra.setId(null);
-        codigoBarra.setProductoId(productoId);
-        return codigoBarraRepository.save(codigoBarra);
+    private CodigoBarra guardarCodigo(
+        CreateCondigoBarrasRequest codigoReq, 
+        Long productoId
+    ) {
+
+        try {
+            
+            CodigoBarra codigoBarra = codigoBarraMapper.toEntity(codigoReq);
+            codigoBarra.setId(null);
+            codigoBarra.setProductoId(productoId);
+            return codigoBarraRepository.save(codigoBarra);
+        } catch (Exception e) {
+            throw new MinorExcepcion(
+                "ERROR",
+                "ProductoService guardarCodigo"
+            );
+        }
     }
 
     @Override
     public void deleteById(Long id) {
-        productoRepository.deleteById(id);
+        try {
+            
+            productoRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new MinorExcepcion(
+                "ERROR",
+                "ProductoService deleteById"
+            );
+        }
     }
 
     @Override
     public Page<Producto> buscarPaginado(FiltroProductoRequest filtro) {
-        PageRequest pageable = PageRequest.of(filtro.getPage(), filtro.getSize());
-        return productoRepository.findAll(ProductoSpecification.buildFrom(filtro), pageable);
+        
+        try {
+            
+            PageRequest pageable = PageRequest.of(filtro.getPage(), filtro.getSize());
+            return productoRepository.findAll(ProductoSpecification.buildFrom(filtro), pageable);
+        } catch (Exception e) {
+            throw new MinorExcepcion(
+                "ERROR",
+                "ProductoService buscarPaginado"
+            );
+        }
     }
 
     @Override
     @Transactional
     public Producto updateProducto(UpdateProductoRequest req) {
 
-        Optional<Producto> productoOpt = findById(req.getId());
-
-        if (!productoOpt.isPresent()) {
-            log.warn("Producto no encontrado {}", req.getId());
-            return null;
-        }
-
-        Producto producto = productoOpt.get();
-        BigDecimal precioAnterior = producto.getPrecioVenta();
-
-        productoMapper.updateEntityFromRequest(req, producto);
-        Producto productoActualizado = productoRepository.save(producto);
-
-        BigDecimal precioNuevo = productoActualizado.getPrecioVenta();
-        boolean precioChanged = precioNuevo != null
-                && (precioAnterior == null || precioAnterior.compareTo(precioNuevo) != 0);
-
-        if (precioChanged) {
-            precioHistoricoRepository.save(PrecioHistorico.builder()
+        try {
+            
+            Optional<Producto> productoOpt = findById(req.getId());
+    
+            if (!productoOpt.isPresent()) {
+                log.warn("Producto no encontrado {}", req.getId());
+                return null;
+            }
+    
+            Producto producto = productoOpt.get();
+            BigDecimal precioAnterior = producto.getPrecioVenta();
+    
+            productoMapper.updateEntityFromRequest(req, producto);
+            Producto productoActualizado = productoRepository.save(producto);
+    
+            BigDecimal precioNuevo = productoActualizado.getPrecioVenta();
+            boolean precioChanged = precioNuevo != null
+                    && (precioAnterior == null || precioAnterior.compareTo(precioNuevo) != 0);
+    
+            if (precioChanged) {
+                precioHistoricoRepository.save(PrecioHistorico.builder()
                 .productoId(productoActualizado.getId())
                 .precioAnterior(precioAnterior)
                 .precioNuevo(precioNuevo)
                 .fechaCreacion(productoActualizado.getFechaActualizacion() != null
                         ? productoActualizado.getFechaActualizacion()
                         : java.time.LocalDateTime.now())
-                .creadoPor(productoActualizado.getActualizadoPor() != null
+                .usuarioId(productoActualizado.getActualizadoPor() != null
                         ? productoActualizado.getActualizadoPor()
-                        : productoActualizado.getCreadoPor())
+                        : productoActualizado.getUsuarioId())
                 .build());
+            }
+    
+            return productoActualizado;
+        } catch (Exception e) {
+            throw new MinorExcepcion(
+                "ERROR",
+            "ProductoService deleteById"
+            );
         }
-
-        return productoActualizado;
     }
 }

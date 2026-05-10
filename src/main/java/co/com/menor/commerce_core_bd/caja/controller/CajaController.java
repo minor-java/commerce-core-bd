@@ -7,13 +7,14 @@ import co.com.menor.comun_dto.caja.request.FiltroCajaRequest;
 import co.com.menor.comun_dto.caja.response.CajaResponse;
 import co.com.menor.comun_dto.paginacion.PaginadoResponse;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/cajas")
+@RequestMapping("/caja")
 @RequiredArgsConstructor
 public class CajaController {
 
@@ -29,27 +30,32 @@ public class CajaController {
         return ResponseEntity.ok(cajaService.cerrarCaja(request));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<CajaResponse> obtenerPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(cajaService.obtenerPorId(id));
+    @GetMapping("/obtener-por-caja-id/{id}")
+    public ResponseEntity<CajaResponse> obtenerPorCajaId(@PathVariable Long id) {
+        return ResponseEntity.ok(cajaService.obtenerPorCajaId(id));
     }
 
-    @GetMapping("/abierta/{usuarioId}")
-    public ResponseEntity<CajaResponse> obtenerCajaAbierta(@PathVariable Long usuarioId) {
-        return ResponseEntity.ok(cajaService.obtenerCajaAbierta(usuarioId));
+    @GetMapping("/obtener-por-usuario-id/{usuarioId}")
+    public ResponseEntity<CajaResponse> obtenerPorUsuarioId(@PathVariable Long usuarioId) {
+        return ResponseEntity.ok(cajaService.obtenerPorUsuarioId(usuarioId));
     }
 
     @PostMapping("/paginado")
     public ResponseEntity<PaginadoResponse<CajaResponse>> buscarPaginado(
-            @RequestBody FiltroCajaRequest filtro) {
+        @RequestBody FiltroCajaRequest filtro
+    ) {
+
         Page<CajaResponse> page = cajaService.buscarPaginado(filtro);
+
         PaginadoResponse<CajaResponse> respuesta = new PaginadoResponse<>(
-                page.getContent(),
-                page.getTotalElements(),
-                page.getNumber(),
-                page.getSize(),
-                page.getTotalPages()
+            page.getContent(),
+            page.getTotalElements(),
+            page.getNumber(),
+            page.getSize(),
+            page.getTotalPages()
         );
+        
         return ResponseEntity.ok(respuesta);
     }
+
 }

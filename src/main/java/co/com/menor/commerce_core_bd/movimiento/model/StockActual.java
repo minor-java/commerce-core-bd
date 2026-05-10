@@ -1,4 +1,4 @@
-package co.com.menor.commerce_core_bd.inventario.model;
+package co.com.menor.commerce_core_bd.movimiento.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

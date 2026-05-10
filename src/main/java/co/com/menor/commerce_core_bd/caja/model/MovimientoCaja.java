@@ -9,11 +9,13 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "MOVIMIENTO_CAJA",
-        indexes = {
-            @Index(name = "idx_movcaja_caja", columnList = "caja_id, fecha_creacion"),
-            @Index(name = "idx_movcaja_referencia", columnList = "referencia_tipo, referencia_id")
-        })
+@Table(
+    name = "MOVIMIENTO_CAJA",
+    indexes = {
+        @Index(name = "idx_movcaja_caja", columnList = "caja_id, fecha_creacion"),
+        @Index(name = "idx_movcaja_referencia", columnList = "referencia_tipo, referencia_id")
+    }
+)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -47,6 +49,6 @@ public class MovimientoCaja {
     @Column(name = "fecha_creacion", nullable = false)
     private LocalDateTime fechaCreacion;
 
-    @Column(name = "creado_por", nullable = false)
-    private Long creadoPor;
+    @Column(name = "usuario_id", nullable = false)
+    private Long usuarioId;
 }

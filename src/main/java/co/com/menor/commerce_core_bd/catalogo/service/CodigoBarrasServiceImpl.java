@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import co.com.menor.commerce_core_bd.catalogo.mapper.CodigoBarraMapper;
 import co.com.menor.commerce_core_bd.catalogo.model.CodigoBarra;
 import co.com.menor.commerce_core_bd.catalogo.repository.CodigoBarraRepository;
+import co.com.menor.commerce_core_bd.shared.exception.MinorExcepcion;
 import co.com.menor.comun_dto.codigo_barras.request.CreateCondigoBarrasRequest;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,39 +26,74 @@ public class CodigoBarrasServiceImpl implements CodigoBarrasService {
     @Override
     public CodigoBarra saveCodigoBarras(CreateCondigoBarrasRequest req) {
 
-        CodigoBarra codigoBarra = codigoBarraMapper.toEntity(req);
-        codigoBarra.setId(null);
+        try {
+            
+            CodigoBarra codigoBarra = codigoBarraMapper.toEntity(req);
+            codigoBarra.setId(null);
+    
+            return codigoBarraRepository.save(codigoBarra);
+        } catch (Exception e) {
 
-        return codigoBarraRepository.save(codigoBarra);
+            throw new MinorExcepcion(
+                "ERROR",
+                "CodigoBarrasService saveCodigoBarras"
+            );
+        }
     }
 
     @Override
     public boolean existsCodigoBarras(String codigoBarras) {
         
-        if (codigoBarras == null) {
-            return false;
+        try {
+            
+            return codigoBarraRepository.existsByCodigo(codigoBarras);
+        } catch (Exception e) {
+            
+            throw new MinorExcepcion(
+                "ERROR",
+                "CodigoBarrasService existsCodigoBarras"
+            );
         }
-
-        return codigoBarraRepository.existsByCodigo(codigoBarras);
     }
 
     @Override
     public Optional<CodigoBarra> findByCodigo(String codigoBarras) {
         
-        if (codigoBarras == null) {
-            return Optional.empty();
+        try {
+            
+            return codigoBarraRepository.findByCodigo(codigoBarras);
+        } catch (Exception e) {
+            throw new MinorExcepcion(
+                "ERROR",
+                "CodigoBarrasService findByCodigo"
+            );
         }
-        return codigoBarraRepository.findByCodigo(codigoBarras);
     }
 
     @Override
     public List<CodigoBarra> findByProductoId(Long productoId) {
-
-        return codigoBarraRepository.findByProductoId(productoId);
+        try {
+            
+            return codigoBarraRepository.findByProductoId(productoId);
+        } catch (Exception e) {
+            throw new MinorExcepcion(
+                "ERROR",
+                "CodigoBarrasService findByProductoId"
+            );
+        }
     }
 
     @Override
     public void deleteById(Long id) {
-        codigoBarraRepository.deleteIfExists(id);
+
+        try {
+            
+            codigoBarraRepository.deleteIfExists(id);
+        } catch (Exception e) {
+            throw new MinorExcepcion(
+                "ERROR",
+                "CodigoBarrasService deleteById"
+            );
+        }
     }
 }

@@ -26,7 +26,7 @@ public class ProductoResponseMapper {
             .activo(producto.isActivo())
             .fechaCreacion(producto.getFechaCreacion())
             .fechaActualizacion(producto.getFechaActualizacion())
-            .creadoPor(producto.getCreadoPor())
+            .usuarioId(producto.getUsuarioId())
             .actualizadoPor(producto.getActualizadoPor())
             .precioVenta(producto.getPrecioVenta())
         .build();
@@ -35,18 +35,18 @@ public class ProductoResponseMapper {
     public ProductoConCodigosResponse toConCodigosResponse(ProductoConCodigos productoConCodigos) {
         Producto producto = productoConCodigos.getProducto();
         return ProductoConCodigosResponse.builder()
-                .id(producto.getId())
-                .nombre(producto.getNombre())
-                .presentacionValor(producto.getPresentacionValor())
-                .presentacionUnidad(producto.getPresentacionUnidad())
-                .activo(producto.isActivo())
-                .fechaCreacion(producto.getFechaCreacion())
-                .fechaActualizacion(producto.getFechaActualizacion())
-                .creadoPor(producto.getCreadoPor())
-                .actualizadoPor(producto.getActualizadoPor())
-                .precioVenta(producto.getPrecioVenta())
-                .codigos(codigoBarraResponseMapper.toResponseList(productoConCodigos.getCodigos()))
-                .build();
+            .id(producto.getId())
+            .nombre(producto.getNombre())
+            .presentacionValor(producto.getPresentacionValor())
+            .presentacionUnidad(producto.getPresentacionUnidad())
+            .activo(producto.isActivo())
+            .fechaCreacion(producto.getFechaCreacion())
+            .fechaActualizacion(producto.getFechaActualizacion())
+            .usuarioId(producto.getUsuarioId())
+            .actualizadoPor(producto.getActualizadoPor())
+            .precioVenta(producto.getPrecioVenta())
+            .codigos(codigoBarraResponseMapper.toResponseList(productoConCodigos.getCodigos()))
+        .build();
     }
 
     public List<ProductoResponse> toResponseList(List<Producto> productos) {

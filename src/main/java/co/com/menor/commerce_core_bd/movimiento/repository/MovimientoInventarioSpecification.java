@@ -1,7 +1,7 @@
-package co.com.menor.commerce_core_bd.inventario.repository;
+package co.com.menor.commerce_core_bd.movimiento.repository;
 
 import co.com.menor.commerce_core_bd.catalogo.model.Producto;
-import co.com.menor.commerce_core_bd.inventario.model.MovimientoInventario;
+import co.com.menor.commerce_core_bd.movimiento.model.MovimientoInventario;
 import co.com.menor.comun_dto.inventario.request.FiltroMovimientoInventarioRequest;
 import org.springframework.data.jpa.domain.Specification;
 

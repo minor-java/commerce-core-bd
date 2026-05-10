@@ -34,8 +34,8 @@ public class Compra {
     @Column(name = "fecha_actualizacion")
     private LocalDateTime fechaActualizacion;
 
-    @Column(name = "creado_por", nullable = false)
-    private Long creadoPor;
+    @Column(name = "usuario_id", nullable = false)
+    private Long usuarioId;
 
     @Column(name = "actualizado_por")
     private Long actualizadoPor;

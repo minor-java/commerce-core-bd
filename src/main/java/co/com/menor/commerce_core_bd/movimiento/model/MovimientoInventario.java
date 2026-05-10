@@ -1,4 +1,4 @@
-package co.com.menor.commerce_core_bd.inventario.model;
+package co.com.menor.commerce_core_bd.movimiento.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -43,8 +43,8 @@ public class MovimientoInventario {
     @Column(name = "fecha_creacion", nullable = false)
     private LocalDateTime fechaCreacion;
 
-    @Column(name = "creado_por", nullable = false)
-    private Long creadoPor;
+    @Column(name = "usuario_id", nullable = false)
+    private Long usuarioId;
 
     @Column(name = "movimiento_origen_id")
     private Long movimientoOrigenId;

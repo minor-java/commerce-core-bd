@@ -1,4 +1,4 @@
-package co.com.menor.commerce_core_bd.inventario.service;
+package co.com.menor.commerce_core_bd.movimiento.service;
 
 import co.com.menor.comun_dto.reverso.request.ReversoRequest;
 import co.com.menor.comun_dto.reverso.response.ReversoResponse;

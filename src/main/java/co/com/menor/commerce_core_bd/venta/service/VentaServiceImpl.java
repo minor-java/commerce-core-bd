@@ -1,19 +1,19 @@
 package co.com.menor.commerce_core_bd.venta.service;
 
 import co.com.menor.commerce_core_bd.caja.model.MovimientoCaja;
-import co.com.menor.commerce_core_bd.caja.repository.CajaRepository;
-import co.com.menor.commerce_core_bd.caja.repository.MovimientoCajaRepository;
-import co.com.menor.commerce_core_bd.inventario.model.MovimientoInventario;
-import co.com.menor.commerce_core_bd.inventario.repository.MovimientoInventarioRepository;
-import co.com.menor.commerce_core_bd.inventario.repository.StockActualRepository;
-import co.com.menor.commerce_core_bd.inventario.service.InventarioService;
+import co.com.menor.commerce_core_bd.caja.service.CajaService;
+import co.com.menor.commerce_core_bd.movimiento.model.MovimientoInventario;
+import co.com.menor.commerce_core_bd.movimiento.model.StockActual;
+import co.com.menor.commerce_core_bd.movimiento.repository.MovimientoCajaRepository;
+import co.com.menor.commerce_core_bd.movimiento.service.MovimientoService;
+import co.com.menor.commerce_core_bd.movimiento.service.StockActualService;
 import co.com.menor.commerce_core_bd.shared.exception.MinorExcepcion;
 import co.com.menor.commerce_core_bd.venta.mapper.VentaMapper;
 import co.com.menor.commerce_core_bd.venta.mapper.VentaResponseMapper;
 import co.com.menor.commerce_core_bd.venta.model.Venta;
 import co.com.menor.commerce_core_bd.venta.model.VentaDetalle;
-import co.com.menor.commerce_core_bd.venta.repository.VentaDetalleRepository;
 import co.com.menor.commerce_core_bd.venta.repository.VentaRepository;
+import co.com.menor.comun_dto.caja.response.CajaResponse;
 import co.com.menor.comun_dto.venta.request.FiltroVentaRequest;
 import co.com.menor.comun_dto.venta.request.VentaRequest;
 import co.com.menor.comun_dto.venta.response.VentaResponse;
@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -36,59 +37,72 @@ import java.util.stream.Collectors;
 public class VentaServiceImpl implements VentaService {
 
     private final VentaRepository ventaRepository;
-    private final VentaDetalleRepository ventaDetalleRepository;
-    private final MovimientoInventarioRepository movimientoRepository;
-    private final StockActualRepository stockActualRepository;
-    private final CajaRepository cajaRepository;
-    private final MovimientoCajaRepository movimientoCajaRepository;
+    private final VentaDetalleService ventaDetalleService;
+    
+    private final MovimientoService movimientoService;
+    
+    // private final MovimientoCajaRepository movimientoCajaRepository;
+    
     private final VentaMapper ventaMapper;
     private final VentaResponseMapper ventaResponseMapper;
-    private final InventarioService inventarioService;
+    
+    private final StockActualService stockActualService;
+    private final CajaService cajaService;
 
     @Override
     @Transactional
     public VentaResponse crearVenta(VentaRequest req) {
-        if (req == null) {
-            throw new MinorExcepcion("REQUEST_NULO", "El cuerpo de la solicitud es obligatorio");
-        }
-        if (req.getDetalles() == null || req.getDetalles().isEmpty()) {
-            throw new MinorExcepcion("DETALLES_REQUERIDOS", "La venta debe contener al menos un detalle");
-        }
-        if (req.getMetodoPago() == null || req.getMetodoPago().trim().isEmpty()) {
-            throw new MinorExcepcion("METODO_PAGO_REQUERIDO", "El método de pago es obligatorio");
-        }
+        
+        // if (req == null) {
+        //     throw new MinorExcepcion("REQUEST_NULO", "El cuerpo de la solicitud es obligatorio");
+        // }
+        // if (req.getDetalles() == null || req.getDetalles().isEmpty()) {
+        //     throw new MinorExcepcion("DETALLES_REQUERIDOS", "La venta debe contener al menos un detalle");
+        // }
+        // if (req.getMetodoPago() == null || req.getMetodoPago().trim().isEmpty()) {
+        //     throw new MinorExcepcion("METODO_PAGO_REQUERIDO", "El método de pago es obligatorio");
+        // }
 
-        co.com.menor.commerce_core_bd.caja.model.Caja cajaAbierta = cajaRepository
-                .findByCreadoPorAndEstado(req.getCreadoPor(), "ABIERTA")
-                .orElseThrow(() -> new MinorExcepcion("CAJA_NO_ABIERTA",
-                        "El usuario " + req.getCreadoPor() + " no tiene una caja abierta"));
+        // CajaResponse cajaAbierta = cajaService.obtenerPorUsuarioId(req.getUsuarioId());
 
-        req.getDetalles().forEach(d -> {
-            java.util.Optional<co.com.menor.commerce_core_bd.inventario.model.StockActual> stockOpt =
-                    stockActualRepository.findByProductoId(d.getProductoId());
-            BigDecimal stockDisponible = stockOpt.map(s -> s.getStock()).orElse(BigDecimal.ZERO);
-            if (stockDisponible.compareTo(d.getCantidad()) < 0) {
-                throw new MinorExcepcion("STOCK_INSUFICIENTE",
-                        "Stock insuficiente para productoId=" + d.getProductoId()
-                        + ". Disponible: " + stockDisponible + ", requerido: " + d.getCantidad());
-            }
-        });
+        // req.getDetalles().forEach(d -> {
+           
+        //     Optional<StockActual> stockOpt = 
+        //     stockActualService.buscarPorProductoId(d.getProductoId());
+
+        //     BigDecimal stockDisponible = stockOpt.map(s -> s.getStock()).orElse(BigDecimal.ZERO);
+            
+        //     if (stockDisponible.compareTo(d.getCantidad()) < 0) {
+
+        //         log.error("El producto no tiene stock disponible: ", d.getProductoId());
+
+        //         throw new MinorExcepcion(
+        //             "ERROR",
+        //             "VentaService crearVenta"
+        //         );
+        //     }
+        // });
 
         Venta venta = ventaMapper.toEntity(req);
         Venta ventaGuardada = ventaRepository.save(venta);
         log.info("crearVenta: venta guardada id={}", ventaGuardada.getId());
 
-        List<VentaDetalle> detalles = req.getDetalles().stream()
-                .map(d -> ventaMapper.toDetalleEntity(d, ventaGuardada.getId()))
-                .collect(Collectors.toList());
-        List<VentaDetalle> detallesGuardados = ventaDetalleRepository.saveAll(detalles);
+        List<VentaDetalle> detalles = req.getDetalles()
+        .stream()
+        .map(d -> ventaMapper.toDetalleEntity(d, ventaGuardada.getId()))
+        .collect(Collectors.toList());
+
+        List<VentaDetalle> detallesGuardados = ventaDetalleService.guardarTodo(detalles);
 
         detallesGuardados.forEach(detalle -> {
-            BigDecimal costoUnitario = stockActualRepository.findByProductoId(detalle.getProductoId())
-                    .map(s -> s.getCostoPromedio())
-                    .orElse(BigDecimal.ZERO);
+            
+            BigDecimal costoUnitario = 
+            stockActualService.buscarPorProductoId(detalle.getProductoId())
+            .map(s -> s.getCostoPromedio())
+                .orElse(BigDecimal.ZERO);
 
             MovimientoInventario movimiento = new MovimientoInventario();
+
             movimiento.setProductoId(detalle.getProductoId());
             movimiento.setTipo("SALIDA");
             movimiento.setCantidad(detalle.getCantidad());
@@ -97,32 +111,32 @@ public class VentaServiceImpl implements VentaService {
             movimiento.setReferenciaTipo("VENTA_DETALLE");
             movimiento.setReferenciaId(detalle.getId());
             movimiento.setFechaCreacion(LocalDateTime.now());
-            movimiento.setCreadoPor(req.getCreadoPor());
-            movimientoRepository.save(movimiento);
+            movimiento.setUsuarioId(req.getUsuarioId());
 
-            inventarioService.actualizarStock(movimiento);
-            log.info("crearVenta: movimiento registrado productoId={} ventaDetalleId={}",
-                    detalle.getProductoId(), detalle.getId());
+            movimientoService.guardarMovimiento(movimiento);
+            stockActualService.actualizarStock(movimiento);
         });
 
         BigDecimal total = detallesGuardados.stream()
-                .map(VentaDetalle::getSubtotal)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        .map(VentaDetalle::getSubtotal)
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         ventaGuardada.setTotal(total);
         ventaRepository.save(ventaGuardada);
 
         MovimientoCaja movCaja = new MovimientoCaja();
-        movCaja.setCajaId(cajaAbierta.getId());
+        movCaja.setCajaId(req.getCajaId());
         movCaja.setTipo("INGRESO");
         movCaja.setMetodoPago(req.getMetodoPago());
         movCaja.setMonto(total);
         movCaja.setReferenciaTipo("VENTA");
         movCaja.setReferenciaId(ventaGuardada.getId());
         movCaja.setFechaCreacion(LocalDateTime.now());
-        movCaja.setCreadoPor(req.getCreadoPor());
-        movimientoCajaRepository.save(movCaja);
-        log.info("crearVenta: movimiento caja registrado cajaId={} monto={}", cajaAbierta.getId(), total);
+        movCaja.setUsuarioId(req.getUsuarioId());
+
+        movimientoService.guardarMovimientoCaja(movCaja);
+        
+        log.info("crearVenta: movimiento caja registrado cajaId={} monto={}", req.getCajaId(), total);
 
         return ventaResponseMapper.toResponse(ventaGuardada, detallesGuardados);
     }
@@ -130,10 +144,12 @@ public class VentaServiceImpl implements VentaService {
     @Override
     @Transactional(readOnly = true)
     public VentaResponse obtenerPorId(Long id) {
+
         Venta venta = ventaRepository.findById(id)
                 .orElseThrow(() -> new MinorExcepcion("VENTA_NO_ENCONTRADA",
                         "No existe una venta con id: " + id));
-        List<VentaDetalle> detalles = ventaDetalleRepository.findByVentaId(id);
+                        
+        List<VentaDetalle> detalles = ventaDetalleService.buscarPorVentaId(id);
         return ventaResponseMapper.toResponse(venta, detalles);
     }
 
@@ -143,7 +159,7 @@ public class VentaServiceImpl implements VentaService {
         PageRequest pageable = PageRequest.of(filtro.getPage(), filtro.getSize());
         Specification<Venta> spec = buildSpec(filtro);
         return ventaRepository.findAll(spec, pageable)
-                .map(v -> ventaResponseMapper.toResponse(v, ventaDetalleRepository.findByVentaId(v.getId())));
+                .map(v -> ventaResponseMapper.toResponse(v, ventaDetalleService.buscarPorVentaId(v.getId())));
     }
 
     private Specification<Venta> buildSpec(FiltroVentaRequest filtro) {

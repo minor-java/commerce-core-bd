@@ -46,6 +46,6 @@ public class Caja {
     @Column(name = "fecha_cierre")
     private LocalDateTime fechaCierre;
 
-    @Column(name = "creado_por", nullable = false)
-    private Long creadoPor;
+    @Column(name = "usuario_id", nullable = false)
+    private Long usuarioId;
 }

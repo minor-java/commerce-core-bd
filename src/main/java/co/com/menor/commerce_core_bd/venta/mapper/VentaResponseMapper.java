@@ -18,7 +18,7 @@ public class VentaResponseMapper {
                 .id(venta.getId())
                 .total(venta.getTotal())
                 .fechaCreacion(venta.getFechaCreacion())
-                .creadoPor(venta.getCreadoPor())
+                .usuarioId(venta.getUsuarioId())
                 .detalles(detalles == null ? null : detalles.stream()
                         .map(this::toDetalleResponse)
                         .collect(Collectors.toList()))

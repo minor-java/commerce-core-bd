@@ -14,7 +14,7 @@ public class VentaMapper {
     public Venta toEntity(VentaRequest req) {
         if (req == null) return null;
         Venta venta = new Venta();
-        venta.setCreadoPor(req.getCreadoPor());
+        venta.setUsuarioId(req.getUsuarioId());
         venta.setFechaCreacion(LocalDateTime.now());
         return venta;
     }

@@ -42,7 +42,7 @@ public class CodigoBarra {
     @Column(name = "fecha_actualizacion", nullable = true)
     private LocalDateTime fechaActualizacion;
     
-    @Column(name = "usuarioId", nullable = false)
+    @Column(name = "usuario_id", nullable = false)
     private Long usuarioId;
 
     @Column(name = "actualizado_por", nullable = true)

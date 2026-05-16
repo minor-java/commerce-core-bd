@@ -27,7 +27,6 @@ public class CompraDetalleMapper {
         detalle.setCostoUnitario(req.getCostoUnitario());
         detalle.setSubtotal(req.getCantidad().multiply(req.getCostoUnitario()));
         detalle.setUsuarioId(usuarioId);
-        detalle.setFechaCreacion(LocalDateTime.now());
         
         return detalle;
     }

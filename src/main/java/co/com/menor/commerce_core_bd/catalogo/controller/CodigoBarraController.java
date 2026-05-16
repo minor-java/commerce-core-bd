@@ -18,6 +18,7 @@ import co.com.menor.commerce_core_bd.catalogo.mapper.CodigoBarraResponseMapper;
 import co.com.menor.commerce_core_bd.catalogo.model.CodigoBarra;
 import co.com.menor.commerce_core_bd.catalogo.service.CodigoBarrasService;
 import co.com.menor.comun_dto.codigo_barras.request.CreateCondigoBarrasRequest;
+import co.com.menor.comun_dto.codigo_barras.request.EliminarCodigosBarrasRequest;
 import co.com.menor.comun_dto.codigo_barras.response.CodigoBarraResponse;
 
 @RestController
@@ -76,10 +77,12 @@ public class CodigoBarraController {
         );
     }
 
-    @DeleteMapping("/delete-by-id/{id}")
-    public ResponseEntity<Void> deleteById(@PathVariable Long id) {
+    @DeleteMapping("/delete-by-ids")
+    public ResponseEntity<Void> deleteByIds(
+        @RequestBody EliminarCodigosBarrasRequest codigoBarras
+    ) {
 
-        codigoBarrasService.deleteById(id);
-        return ResponseEntity.noContent().build();
+        codigoBarrasService.deleteByIds(codigoBarras);
+        return ResponseEntity.ok().build();
     }
 }

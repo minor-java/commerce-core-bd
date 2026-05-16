@@ -20,6 +20,7 @@ public class CodigoBarraMapper {
         codigoBarra.setTipo(req.getTipo());
         codigoBarra.setFechaCreacion(req.getFechaCreacion());
         codigoBarra.setUsuarioId(req.getUsuarioId());
+        codigoBarra.setProductoId(req.getProductoId());
 
         return codigoBarra;
     }

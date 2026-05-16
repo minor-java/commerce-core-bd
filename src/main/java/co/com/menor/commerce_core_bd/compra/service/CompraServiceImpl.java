@@ -1,5 +1,7 @@
 package co.com.menor.commerce_core_bd.compra.service;
 
+import co.com.menor.commerce_core_bd.catalogo.model.Producto;
+import co.com.menor.commerce_core_bd.catalogo.repository.ProductoRepository;
 import co.com.menor.commerce_core_bd.compra.mapper.CompraDetalleMapper;
 import co.com.menor.commerce_core_bd.compra.mapper.CompraMapper;
 import co.com.menor.commerce_core_bd.compra.model.Compra;
@@ -29,11 +31,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CompraServiceImpl implements CompraService {
 
-    private final CompraRepository compraRepository;    
-    
+    private final CompraRepository compraRepository;
+
     private final CompraMapper compraMapper;
     private final CompraDetalleMapper compraDetalleMapper;
-    
+
     private final MovimientoService inventarioService;
     private final CompreDetalleService compreDetalleService;
 
@@ -42,7 +44,7 @@ public class CompraServiceImpl implements CompraService {
     public CompraResponse crearCompra(CompraRequest req) {
        
         try {
-            
+
             Compra compra = compraMapper.toEntity(req);
             Compra compraGuardada = compraRepository.save(compra);
             log.info("crearCompra: compra guardada id={}", compraGuardada.getId());
@@ -82,11 +84,10 @@ public class CompraServiceImpl implements CompraService {
     
             return compraMapper.toResponse(compraGuardada);
 
+        } catch (MinorExcepcion e) {
+            throw e;
         } catch (Exception e) {
-            throw new MinorExcepcion(
-                "ERROR",
-                "CompraService crearCompra"
-            );
+            throw new MinorExcepcion("ERROR", "CompraService crearCompra");
         }
     }
 

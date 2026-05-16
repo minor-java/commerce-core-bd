@@ -49,8 +49,8 @@ public class CompraController {
         return ResponseEntity.ok(respuesta);
     }
 
-    @GetMapping("/consulta-detalle-por-producto-id/{id}")
-    public ResponseEntity<List<CompraDetalleResponse>> buscarPorNombre(
+    @GetMapping("/consulta-detalle-por-compra-id/{id}")
+    public ResponseEntity<List<CompraDetalleResponse>> buscarPorCompraId(
         @PathVariable Long id
     ) {
 

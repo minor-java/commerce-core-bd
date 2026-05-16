@@ -15,8 +15,12 @@ public interface CajaService {
 
     CajaResponse obtenerPorCajaId(Long id);
 
-    CajaResponse obtenerPorUsuarioId(Long usuarioId);
+    Boolean existeCaja(Long usuarioId);
+
+    Boolean tieneCajaActiva(Long usuarioId);
 
     Page<CajaResponse> buscarPaginado(FiltroCajaRequest filtro);
+
+    CajaResponse obtenerPorUsuarioIdPorEstado(Long usuarioId);
     
 }

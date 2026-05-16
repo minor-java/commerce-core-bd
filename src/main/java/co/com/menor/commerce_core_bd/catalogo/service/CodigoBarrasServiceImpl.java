@@ -3,6 +3,8 @@ package co.com.menor.commerce_core_bd.catalogo.service;
 import java.util.List;
 import java.util.Optional;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +13,7 @@ import co.com.menor.commerce_core_bd.catalogo.model.CodigoBarra;
 import co.com.menor.commerce_core_bd.catalogo.repository.CodigoBarraRepository;
 import co.com.menor.commerce_core_bd.shared.exception.MinorExcepcion;
 import co.com.menor.comun_dto.codigo_barras.request.CreateCondigoBarrasRequest;
+import co.com.menor.comun_dto.codigo_barras.request.EliminarCodigosBarrasRequest;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -84,15 +87,20 @@ public class CodigoBarrasServiceImpl implements CodigoBarrasService {
     }
 
     @Override
-    public void deleteById(Long id) {
+    @Transactional
+    public void deleteByIds(EliminarCodigosBarrasRequest codigoBarras) {
 
         try {
+
+            for (Long id : codigoBarras.getIds()) {
+                if (id == null) continue;
+                codigoBarraRepository.deleteIfExists(id);
+            }
             
-            codigoBarraRepository.deleteIfExists(id);
         } catch (Exception e) {
             throw new MinorExcepcion(
                 "ERROR",
-                "CodigoBarrasService deleteById"
+                "CodigoBarrasService deleteByIds"
             );
         }
     }

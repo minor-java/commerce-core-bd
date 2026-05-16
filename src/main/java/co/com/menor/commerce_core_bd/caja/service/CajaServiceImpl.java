@@ -77,14 +77,26 @@ public class CajaServiceImpl implements CajaService {
     }
 
     @Override
-    public CajaResponse obtenerPorUsuarioId(Long usuarioId) {
+    @Transactional(readOnly = true)
+    public Boolean existeCaja(Long usuarioId) {
 
-        Caja caja = cajaRepository.findByUsuarioIdAndEstado(
+        return cajaRepository.existsByUsuarioId(usuarioId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public CajaResponse obtenerPorUsuarioIdPorEstado(Long usuarioId) {
+
+        return cajaRepository.findByUsuarioIdAndEstado(
             usuarioId,
             CajaConstants.ESTADO_ABIERTA
-        ).orElse(null);
+        ).map(cajaMapper::toResponse).orElse(null);
+    }
 
-        return cajaMapper.toResponse(caja);
+    @Override
+    @Transactional(readOnly = true)
+    public Boolean tieneCajaActiva(Long usuarioId) {
+        return cajaRepository.findByUsuarioIdAndEstado(usuarioId, CajaConstants.ESTADO_ABIERTA).isPresent();
     }
 
     @Override

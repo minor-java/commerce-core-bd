@@ -11,4 +11,6 @@ import java.util.Optional;
 public interface CajaRepository extends JpaRepository<Caja, Long>, JpaSpecificationExecutor<Caja> {
 
     Optional<Caja> findByUsuarioIdAndEstado(Long usuarioId, String estado);
+    Optional<Caja> findByUsuarioId(Long usuarioId);
+    boolean existsByUsuarioId(Long usuarioId);
 }

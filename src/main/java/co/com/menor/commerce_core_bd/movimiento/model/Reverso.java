@@ -31,6 +31,6 @@ public class Reverso {
     @Column(name = "fecha_creacion", nullable = false)
     private LocalDateTime fechaCreacion;
 
-    @Column(name = "usuarioId", nullable = false)
+    @Column(name = "usuario_id", nullable = false)
     private Long usuarioId;
 }

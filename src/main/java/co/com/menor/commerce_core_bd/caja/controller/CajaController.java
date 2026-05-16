@@ -32,12 +32,30 @@ public class CajaController {
 
     @GetMapping("/obtener-por-caja-id/{id}")
     public ResponseEntity<CajaResponse> obtenerPorCajaId(@PathVariable Long id) {
-        return ResponseEntity.ok(cajaService.obtenerPorCajaId(id));
+        CajaResponse caja = cajaService.obtenerPorCajaId(id);
+        if (caja == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(caja);
     }
 
-    @GetMapping("/obtener-por-usuario-id/{usuarioId}")
-    public ResponseEntity<CajaResponse> obtenerPorUsuarioId(@PathVariable Long usuarioId) {
-        return ResponseEntity.ok(cajaService.obtenerPorUsuarioId(usuarioId));
+    @GetMapping("/existe-caja/{usuarioId}")
+    public ResponseEntity<Boolean> existeCaja(@PathVariable Long usuarioId) {
+        return ResponseEntity.ok(cajaService.existeCaja(usuarioId));
+    }
+
+    @GetMapping("/obtener/por-usuario/por-estado/{usuarioId}")
+    public ResponseEntity<CajaResponse> obtenerPorUsuarioIdPorEstado(@PathVariable Long usuarioId) {
+        CajaResponse caja = cajaService.obtenerPorUsuarioIdPorEstado(usuarioId);
+        if (caja == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(caja);
+    }
+
+    @GetMapping("/tiene-caja-activa/{usuarioId}")
+    public ResponseEntity<Boolean> tieneCajaActiva(@PathVariable Long usuarioId) {
+        return ResponseEntity.ok(cajaService.tieneCajaActiva(usuarioId));
     }
 
     @PostMapping("/paginado")

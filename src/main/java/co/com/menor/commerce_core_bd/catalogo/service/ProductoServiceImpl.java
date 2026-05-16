@@ -1,6 +1,7 @@
 package co.com.menor.commerce_core_bd.catalogo.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +30,7 @@ import co.com.menor.comun_dto.producto.request.CreateProductoRequest;
 import co.com.menor.comun_dto.producto.request.ExistsProductoRequest;
 import co.com.menor.comun_dto.producto.request.FiltroProductoRequest;
 import co.com.menor.comun_dto.producto.request.UpdateProductoRequest;
+import co.com.menor.comun_dto.utils.CodigoBarrasConstants;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -123,10 +125,13 @@ public class ProductoServiceImpl implements ProductoService {
     
             List<CodigoBarra> codigosGuardados = Collections.emptyList();
     
-            if (req.getCodigos() != null && !req.getCodigos().isEmpty()) {
-                codigosGuardados = req.getCodigos().stream()
-                    .map(codigoReq -> guardarCodigo(codigoReq, productoGuardado.getId()))
-                    .collect(Collectors.toList());
+            if (req.getCodigosBarras() != null && !req.getCodigosBarras().isEmpty()) {
+                
+                guardarCodigosBarras(
+                    productoGuardado.getId(),
+                    req.getUsuarioId(),
+                    req.getCodigosBarras()
+                );
             }
     
             if (productoGuardado.getPrecioVenta() != null) {
@@ -148,16 +153,39 @@ public class ProductoServiceImpl implements ProductoService {
         }
     }
 
+    private void guardarCodigosBarras(Long productoId, Long usuarioId, List<String> codigos) {
+
+        if (codigos == null || codigos.isEmpty()) {
+            return;
+        }
+
+        List<String> codigosValidos = codigos.stream()
+            .filter(c -> c != null && !c.trim().isEmpty())
+            .collect(Collectors.toList());
+
+        for (int i = 0; i < codigosValidos.size(); i++) {
+
+            String codigo = codigosValidos.get(i);
+
+            CreateCondigoBarrasRequest cbReq = new CreateCondigoBarrasRequest();
+            cbReq.setProductoId(productoId);
+            cbReq.setCodigo(codigo);
+            cbReq.setTipo(CodigoBarrasConstants.TIPO_EAN_13);
+            cbReq.setFechaCreacion(LocalDateTime.now());
+            cbReq.setUsuarioId(usuarioId);
+
+            guardarCodigo(cbReq);
+        }
+    }
+
     private CodigoBarra guardarCodigo(
-        CreateCondigoBarrasRequest codigoReq, 
-        Long productoId
+        CreateCondigoBarrasRequest codigoReq
     ) {
 
         try {
             
             CodigoBarra codigoBarra = codigoBarraMapper.toEntity(codigoReq);
             codigoBarra.setId(null);
-            codigoBarra.setProductoId(productoId);
             return codigoBarraRepository.save(codigoBarra);
         } catch (Exception e) {
             throw new MinorExcepcion(

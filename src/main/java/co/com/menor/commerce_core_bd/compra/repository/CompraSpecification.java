@@ -5,6 +5,8 @@ import co.com.menor.comun_dto.compra.request.FiltroCompraRequest;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.Predicate;
+
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,10 +25,20 @@ public class CompraSpecification {
                 ));
             }
             if (filtro.getFechaDesde() != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("fechaCreacion"), filtro.getFechaDesde()));
+                predicates.add(
+                    cb.greaterThanOrEqualTo(
+                        root.get("fechaCreacion"),
+                        filtro.getFechaDesde()
+                    )
+                );
             }
             if (filtro.getFechaHasta() != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("fechaCreacion"), filtro.getFechaHasta()));
+                predicates.add(
+                    cb.lessThanOrEqualTo(
+                        root.get("fechaCreacion"),
+                        filtro.getFechaHasta()
+                    )
+                );
             }
             if (filtro.getUsuarioId() != null) {
                 predicates.add(cb.equal(root.get("usuarioId"), filtro.getUsuarioId()));

@@ -44,6 +44,10 @@ public class ProductoSpecification {
                 predicates.add(cb.equal(root.get("activo"), filtro.getActivo()));
             }
 
+            if (filtro.getPrecioVenta() != null) {
+                predicates.add(cb.equal(root.get("precioVenta"), filtro.getPrecioVenta()));
+            }
+
             if (filtro.getCodigoBarra() != null && !filtro.getCodigoBarra().trim().isEmpty()) {
                 Subquery<Long> subquery = query.subquery(Long.class);
                 Root<CodigoBarra> cbRoot = subquery.from(CodigoBarra.class);

@@ -6,7 +6,6 @@ import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.Predicate;
 
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 

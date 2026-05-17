@@ -47,6 +47,27 @@ public class CajaMapper {
         .build();
     }
 
+    public CajaResponse toPaginadoResponse(Caja caja, String usuario) {
+        if (caja == null) return null;
+        boolean conDiferencia = caja.getDiferencia() != null
+            && caja.getDiferencia().compareTo(BigDecimal.ZERO) != 0;
+        return CajaResponse.builder()
+            .id(caja.getId())
+            .montoInicial(caja.getMontoInicial())
+            .totalIngresos(caja.getTotalIngresos())
+            .totalEgresos(caja.getTotalEgresos())
+            .saldoEsperado(caja.getSaldoEsperado())
+            .montoCierreReal(caja.getMontoCierreReal())
+            .diferencia(caja.getDiferencia())
+            .estado(caja.getEstado())
+            .fechaApertura(caja.getFechaApertura())
+            .fechaCierre(caja.getFechaCierre())
+            .usuarioId(caja.getUsuarioId())
+            .usuario(usuario)
+            .conDiferencia(conDiferencia)
+        .build();
+    }
+
     public MovimientoCajaResponse toMovimientoResponse(MovimientoCaja movimiento) {
         if (movimiento == null) return null;
         return MovimientoCajaResponse.builder()

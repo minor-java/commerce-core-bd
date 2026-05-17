@@ -1,12 +1,14 @@
 package co.com.menor.commerce_core_bd.movimiento.controller;
 
-import co.com.menor.commerce_core_bd.movimiento.mapper.MovimientoInventarioMapper;
 import co.com.menor.commerce_core_bd.movimiento.service.MovimientoService;
+import co.com.menor.commerce_core_bd.movimiento.service.StockActualService;
 import co.com.menor.comun_dto.caja.request.SumaMovimientoCajaRequest;
 import co.com.menor.comun_dto.inventario.request.CreateMovimientoInventarioRequest;
 import co.com.menor.comun_dto.inventario.request.FiltroMovimientoInventarioRequest;
+import co.com.menor.comun_dto.inventario.request.FiltroStockRequest;
 import co.com.menor.comun_dto.inventario.response.MovimientoInventarioResponse;
 import co.com.menor.comun_dto.inventario.response.StockActualResponse;
+import co.com.menor.comun_dto.inventario.response.StockPaginadoResponse;
 import co.com.menor.comun_dto.paginacion.PaginadoResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class InventarioController {
 
     private final MovimientoService inventarioService;    
+    private final StockActualService stockActualService;    
 
     @GetMapping("/movimiento/{id}")
     public ResponseEntity<MovimientoInventarioResponse> getMovimientoById(@PathVariable Long id) {
@@ -78,5 +81,22 @@ public class InventarioController {
     @GetMapping("/stock/{productoId}")
     public ResponseEntity<StockActualResponse> consultarStock(@PathVariable Long productoId) {
         return ResponseEntity.ok(inventarioService.consultarStock(productoId));
+    }
+
+    @PostMapping("/stock/paginado")
+    public ResponseEntity<PaginadoResponse<StockPaginadoResponse>> obtenerStockPaginado(
+        @RequestBody(required = false) FiltroStockRequest filtro
+    ) {
+        Page<StockPaginadoResponse> page = stockActualService.obtenerStockPaginado(filtro);
+
+        PaginadoResponse<StockPaginadoResponse> respuesta = new PaginadoResponse<>(
+            page.getContent(),
+            page.getTotalElements(),
+            page.getNumber(),
+            page.getSize(),
+            page.getTotalPages()
+        );
+
+        return ResponseEntity.ok(respuesta);
     }
 }

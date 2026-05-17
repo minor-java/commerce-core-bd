@@ -5,8 +5,10 @@ import co.com.menor.commerce_core_bd.movimiento.model.MovimientoInventario;
 import co.com.menor.comun_dto.caja.request.SumaMovimientoCajaRequest;
 import co.com.menor.comun_dto.inventario.request.CreateMovimientoInventarioRequest;
 import co.com.menor.comun_dto.inventario.request.FiltroMovimientoInventarioRequest;
+import co.com.menor.comun_dto.inventario.request.FiltroStockRequest;
 import co.com.menor.comun_dto.inventario.response.MovimientoInventarioResponse;
 import co.com.menor.comun_dto.inventario.response.StockActualResponse;
+import co.com.menor.comun_dto.inventario.response.StockPaginadoResponse;
 
 import java.math.BigDecimal;
 import java.util.Optional;

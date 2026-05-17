@@ -1,7 +1,6 @@
 package co.com.menor.commerce_core_bd.venta.service;
 
 import co.com.menor.commerce_core_bd.caja.model.MovimientoCaja;
-import co.com.menor.commerce_core_bd.caja.service.CajaService;
 import co.com.menor.commerce_core_bd.movimiento.model.MovimientoInventario;
 import co.com.menor.commerce_core_bd.movimiento.service.MovimientoService;
 import co.com.menor.commerce_core_bd.movimiento.service.StockActualService;

@@ -22,5 +22,5 @@ public interface CajaService {
     Page<CajaResponse> buscarPaginado(FiltroCajaRequest filtro);
 
     CajaResponse obtenerPorUsuarioIdPorEstado(Long usuarioId);
-    
+
 }

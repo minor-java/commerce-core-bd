@@ -46,31 +46,12 @@ public class CodigoBarrasServiceImpl implements CodigoBarrasService {
 
     @Override
     public boolean existsCodigoBarras(String codigoBarras) {
-        
-        try {
-            
-            return codigoBarraRepository.existsByCodigo(codigoBarras);
-        } catch (Exception e) {
-            
-            throw new MinorExcepcion(
-                "ERROR",
-                "CodigoBarrasService existsCodigoBarras"
-            );
-        }
+        return codigoBarraRepository.existsByCodigo(codigoBarras);
     }
 
     @Override
     public Optional<CodigoBarra> findByCodigo(String codigoBarras) {
-        
-        try {
-            
-            return codigoBarraRepository.findByCodigo(codigoBarras);
-        } catch (Exception e) {
-            throw new MinorExcepcion(
-                "ERROR",
-                "CodigoBarrasService findByCodigo"
-            );
-        }
+        return codigoBarraRepository.findByCodigo(codigoBarras);
     }
 
     @Override

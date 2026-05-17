@@ -2,49 +2,58 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Commands
+## Build & Run Commands
 
 ```bash
 # Build
-./mvnw clean package
-./mvnw clean package -DskipTests
+mvn clean package
 
-# Run
-./mvnw spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=local"
+# Run locally (default profile)
+mvn spring-boot:run
 
-# Test
-./mvnw test
-./mvnw test -Dtest=ClassName          # single test class
+# Run with explicit profile
+mvn spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=local"
+
+# Run all tests
+mvn test
+
+# Run a single test class
+mvn test -Dtest=ClassName
+
+# Run a single test method
+mvn test -Dtest=ClassName#methodName
 ```
 
-## Architecture
+The server starts on **port 9092** with context path `/api`.
 
-Spring Boot 2.4.4 microservice (Java 8, Maven) running on port `9092` with context path `/api`. Two business domains:
+## Architecture Overview
 
-- **usuario** — user authentication (entity: `USUARIOS`)
-- **catalogo** — product catalog with two sub-entities (`PRODUCTOS`, `CODIGO_BARRAS`)
+Spring Boot 2.4.4 / Java 8 microservice. No migration tool — schema is managed via Hibernate `ddl-auto: update`. Two profiles: `local` (MySQL) and `produccion` (PostgreSQL), configured in `application-local.yml` and `application-produccion.yml`.
 
-Each domain follows a strict layered structure: `controller → service (interface + impl) → repository → model`, with MapStruct `mapper` classes converting between JPA entities and DTOs from the shared `co.com.menor.comun_dto` library.
+DTOs (request/response objects) live in an external Maven dependency: **`comun-dto:0.0.1-SNAPSHOT`**. If a DTO class is missing from this repo, it is defined there.
 
-## Profiles & Databases
+### Domain Modules
 
-| Profile | DB | Config file |
-|---|---|---|
-| `local` (default) | MySQL on `localhost:3306`, database `minor` | `application-local.yml` |
-| `produccion` | PostgreSQL on `localhost:5432` | `application-produccion.yml` |
+Each module under `co.com.menor.commerce_core_bd` follows the same layered structure: `model` → `repository` → `service` (interface + impl) → `mapper` → `controller`.
 
-Active profile is injected at build time via the Maven property `@activatedProperties@`.
+| Module | Responsibility |
+|---|---|
+| `usuario` | User accounts and login |
+| `catalogo` | Products (`Producto`), bar codes (`CodigoBarra`), price history (`PrecioHistorico`) |
+| `compra` | Purchase orders (`Compra`, `CompraDetalle`) |
+| `venta` | Sales transactions (`Venta`, `VentaDetalle`) |
+| `movimiento` | Inventory ledger (`MovimientoInventario`), current stock (`StockActual`), reversals (`Reverso`) |
+| `caja` | Cash register sessions (`Caja`, `MovimientoCaja`) |
+| `shared` | `MinorExcepcion` + `GlobalExceptionHandler` (`@RestControllerAdvice`) |
 
-## Key Dependencies
+### Key Cross-Cutting Patterns
 
-- **Lombok** — used heavily for `@Data`, `@Builder`, `@RequiredArgsConstructor`; ensure annotation processing is enabled in your IDE
-- **MapStruct 1.5.5** — mappers are auto-generated; both `mapstruct-processor` and `lombok` annotation processors are declared in the compiler plugin to avoid ordering issues
-- **Spring Data JPA** — repositories extend `JpaRepository`; custom finders use Spring Data query derivation or `@Query`
+**Transactional workflows** — Service impls coordinate multiple repositories inside a single `@Transactional` method. For example, `VentaServiceImpl.crearVenta` creates the sale header, line items, inventory movements, and cash movements atomically. `CompraServiceImpl` does the same for purchases.
 
-## API Endpoints
+**Inventory costing** — `StockActual` stores a weighted average cost (`costoPromedio`). Every sale/purchase updates this record and appends an immutable row to `MovimientoInventario`. Reversals create a compensating movement linked via `movimientoOrigenId`.
 
-| Controller | Base | Operations |
-|---|---|---|
-| `UsuarioController` | `/usuario` | `POST /guardar`, `GET /usuarios`, `GET /existe-usuario/{u}`, `GET /consulta-usuario/{u}`, `PUT /actualizar` |
-| `ProductoController` | `/producto` | `POST /guardar`, `GET /productos`, `POST /consulta-por-nombre`, `POST /existe-producto`, `PUT /actualizar` |
-| `CodigoBarraController` | `/codigo-barras` | CRUD for barcodes linked to products |
+**Dynamic filtering** — `ProductoSpecification`, `CompraSpecification`, and `MovimientoInventarioSpecification` implement `Specification<T>` (JPA Criteria API) for paginated search endpoints that accept arbitrary filter combinations.
+
+**Mappers** — Plain `@Component` classes (not MapStruct despite the dependency). Located in each module's `mapper` package. Two directions per entity: request → entity and entity → response DTO.
+
+**Error handling** — Throw `MinorExcepcion(code, message)` from any service. `GlobalExceptionHandler` catches it and returns a structured error response; unhandled exceptions return a generic 500.

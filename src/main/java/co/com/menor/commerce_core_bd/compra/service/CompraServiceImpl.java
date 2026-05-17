@@ -1,7 +1,5 @@
 package co.com.menor.commerce_core_bd.compra.service;
 
-import co.com.menor.commerce_core_bd.catalogo.model.Producto;
-import co.com.menor.commerce_core_bd.catalogo.repository.ProductoRepository;
 import co.com.menor.commerce_core_bd.compra.mapper.CompraDetalleMapper;
 import co.com.menor.commerce_core_bd.compra.mapper.CompraMapper;
 import co.com.menor.commerce_core_bd.compra.model.Compra;

@@ -13,20 +13,20 @@ public class UsuarioResponseMapper {
 
     public UsuarioResponse toResponse(Usuario usuario) {
         return UsuarioResponse.builder()
-                .id(usuario.getId())
-                .usuario(usuario.getUsuario())
-                .intentos(usuario.getIntentos())
-                .activo(usuario.getActivo())
-                .fechaCreacion(usuario.getFechaCreacion())
-                .fechaActualizacion(usuario.getFechaActualizacion())
-                .ultimoLogin(usuario.getUltimoLogin())
-                .rol(usuario.getRol())
-                .build();
+            .id(usuario.getId())
+            .usuario(usuario.getUsuario())
+            .intentos(usuario.getIntentos())
+            .activo(usuario.getActivo())
+            .fechaCreacion(usuario.getFechaCreacion())
+            .fechaActualizacion(usuario.getFechaActualizacion())
+            .ultimoLogin(usuario.getUltimoLogin())
+            .rol(usuario.getRol())
+        .build();
     }
 
     public List<UsuarioResponse> toResponseList(List<Usuario> usuarios) {
         return usuarios.stream()
-                .map(this::toResponse)
-                .collect(Collectors.toList());
+            .map(this::toResponse)
+            .collect(Collectors.toList());
     }
 }

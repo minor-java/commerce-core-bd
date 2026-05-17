@@ -1,7 +1,15 @@
 {
   "permissions": {
     "allow": [
-      "Bash(./mvnw clean *)"
+      "Bash(./mvnw clean *)",
+      "Bash(mvn --version)",
+      "Bash(jar tf *)",
+      "Bash(jar xf *)",
+      "Bash(javap -p co/com/menor/comun_dto/caja/response/CajaResponse.class)",
+      "Bash(javap -p co/com/menor/comun_dto/caja/request/FiltroCajaRequest.class)",
+      "Bash(mvn compile *)",
+      "Bash(mvn clean *)",
+      "Bash(Remove-Item *)"
     ]
   }
 }

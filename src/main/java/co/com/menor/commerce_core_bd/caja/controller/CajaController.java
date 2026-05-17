@@ -72,7 +72,7 @@ public class CajaController {
             page.getSize(),
             page.getTotalPages()
         );
-        
+
         return ResponseEntity.ok(respuesta);
     }
 

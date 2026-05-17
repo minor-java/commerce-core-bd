@@ -59,9 +59,10 @@ public class ProductoServiceImpl implements ProductoService {
             
             return productoRepository.findById(productoId);
         } catch (Exception e) {
+            log.error("Error en findById producto: ",e);
             throw new MinorExcepcion(
                 "ERROR",
-                "ProductoService findById"
+                "El producto no existe"
             );
         }
     }
@@ -118,38 +119,40 @@ public class ProductoServiceImpl implements ProductoService {
     public ProductoConCodigos saveProducto(CreateProductoRequest req) {
 
         try {
-            
             Producto productoModel = productoMapper.toEntity(req);
             productoModel.setId(null);
             Producto productoGuardado = productoRepository.save(productoModel);
-    
+
             List<CodigoBarra> codigosGuardados = Collections.emptyList();
-    
+
             if (req.getCodigosBarras() != null && !req.getCodigosBarras().isEmpty()) {
-                
                 guardarCodigosBarras(
                     productoGuardado.getId(),
                     req.getUsuarioId(),
                     req.getCodigosBarras()
                 );
             }
-    
+
             if (productoGuardado.getPrecioVenta() != null) {
-                precioHistoricoRepository.save(PrecioHistorico.builder()
+                
+                PrecioHistorico historico = PrecioHistorico.builder()
                     .productoId(productoGuardado.getId())
                     .precioAnterior(null)
                     .precioNuevo(productoGuardado.getPrecioVenta())
                     .fechaCreacion(productoGuardado.getFechaCreacion())
                     .usuarioId(productoGuardado.getUsuarioId())
-                .build());
+                .build();
+
+                precioHistoricoRepository.save(historico);
             }
-    
+
             return new ProductoConCodigos(productoGuardado, codigosGuardados);
+            
+        } catch (MinorExcepcion e) {
+            throw e;
         } catch (Exception e) {
-            throw new MinorExcepcion(
-                "ERROR",
-                "ProductoService saveProducto"
-            );
+            log.error("Error en saveProducto", e);
+            throw new MinorExcepcion("ERROR", "ProductoService saveProducto");
         }
     }
 
@@ -233,7 +236,10 @@ public class ProductoServiceImpl implements ProductoService {
     
             if (!productoOpt.isPresent()) {
                 log.warn("Producto no encontrado {}", req.getId());
-                return null;
+                throw new MinorExcepcion(
+                    "ERROR",
+                    "El producto no existe"
+                );
             }
     
             Producto producto = productoOpt.get();
@@ -247,17 +253,20 @@ public class ProductoServiceImpl implements ProductoService {
                     && (precioAnterior == null || precioAnterior.compareTo(precioNuevo) != 0);
     
             if (precioChanged) {
-                precioHistoricoRepository.save(PrecioHistorico.builder()
-                .productoId(productoActualizado.getId())
-                .precioAnterior(precioAnterior)
-                .precioNuevo(precioNuevo)
-                .fechaCreacion(productoActualizado.getFechaActualizacion() != null
-                        ? productoActualizado.getFechaActualizacion()
-                        : java.time.LocalDateTime.now())
-                .usuarioId(productoActualizado.getActualizadoPor() != null
-                        ? productoActualizado.getActualizadoPor()
-                        : productoActualizado.getUsuarioId())
-                .build());
+
+                PrecioHistorico historico = PrecioHistorico.builder()
+                    .productoId(productoActualizado.getId())
+                    .precioAnterior(precioAnterior)
+                    .precioNuevo(precioNuevo)
+                    .fechaCreacion(productoActualizado.getFechaActualizacion() != null
+                            ? productoActualizado.getFechaActualizacion()
+                            : LocalDateTime.now())
+                    .usuarioId(productoActualizado.getActualizadoPor() != null
+                            ? productoActualizado.getActualizadoPor()
+                            : productoActualizado.getUsuarioId())
+                    .build();
+
+                precioHistoricoRepository.save(historico);
             }
     
             return productoActualizado;

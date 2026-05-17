@@ -6,7 +6,6 @@ import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.Predicate;
 
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,15 +27,15 @@ public class CompraSpecification {
                 predicates.add(
                     cb.greaterThanOrEqualTo(
                         root.get("fechaCreacion"),
-                        filtro.getFechaDesde()
+                        filtro.getFechaDesde().atStartOfDay()
                     )
                 );
             }
             if (filtro.getFechaHasta() != null) {
                 predicates.add(
-                    cb.lessThanOrEqualTo(
+                    cb.lessThan(
                         root.get("fechaCreacion"),
-                        filtro.getFechaHasta()
+                        filtro.getFechaHasta().plusDays(1).atStartOfDay()
                     )
                 );
             }

@@ -3,6 +3,7 @@ package co.com.menor.commerce_core_bd.caja.service;
 import co.com.menor.commerce_core_bd.caja.mapper.CajaMapper;
 import co.com.menor.commerce_core_bd.caja.model.Caja;
 import co.com.menor.commerce_core_bd.caja.repository.CajaRepository;
+import co.com.menor.commerce_core_bd.usuario.service.UsuarioService;
 import co.com.menor.comun_dto.caja.request.AbrirCajaRequest;
 import co.com.menor.comun_dto.caja.request.CerrarCajaRequest;
 import co.com.menor.comun_dto.caja.request.FiltroCajaRequest;
@@ -16,6 +17,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -23,6 +27,7 @@ public class CajaServiceImpl implements CajaService {
 
     private final CajaRepository cajaRepository;
     private final CajaMapper cajaMapper;
+    private final UsuarioService usuarioService;
 
     @Override
     @Transactional
@@ -104,54 +109,67 @@ public class CajaServiceImpl implements CajaService {
     public Page<CajaResponse> buscarPaginado(FiltroCajaRequest filtro) {
         PageRequest pageable = PageRequest.of(filtro.getPage(), filtro.getSize());
         Specification<Caja> spec = buildSpec(filtro);
-        return cajaRepository.findAll(spec, pageable).map(cajaMapper::toResponse);
+        Page<Caja> page = cajaRepository.findAll(spec, pageable);
+        Map<Long, String> usuarioCache = new HashMap<>();
+        return page.map(caja -> {
+            String usuario = resolverNombreUsuario(caja.getUsuarioId(), usuarioCache);
+            return cajaMapper.toPaginadoResponse(caja, usuario);
+        });
     }
 
-    // friltro paginado
+    private String resolverNombreUsuario(Long usuarioId, Map<Long, String> cache) {
+        if (usuarioId == null) return null;
+        if (cache.containsKey(usuarioId)) return cache.get(usuarioId);
+        String nombre = null;
+        try {
+            nombre = usuarioService.findById(usuarioId)
+                .map(u -> u.getUsuario())
+                .orElse(null);
+        } catch (Exception e) {
+            log.warn("No se pudo obtener usuario id={}", usuarioId);
+        }
+        cache.put(usuarioId, nombre);
+        return nombre;
+    }
+
     private Specification<Caja> buildSpec(FiltroCajaRequest filtro) {
         return (root, query, cb) -> {
 
             java.util.List<javax.persistence.criteria.Predicate> predicates = new java.util.ArrayList<>();
-           
+
             if (filtro.getEstado() != null && !filtro.getEstado().trim().isEmpty()) {
-                predicates.add(
-                    cb.equal(
-                        root.get("estado"), 
-                        filtro.getEstado().trim().toUpperCase()
-                    )
-                );
+                predicates.add(cb.equal(root.get("estado"), filtro.getEstado().trim().toUpperCase()));
             }
 
             if (filtro.getUsuarioId() != null) {
-                predicates.add(
-                    cb.equal(
-                        root.get("usuarioId"),
-                        filtro.getUsuarioId()
-                    )
-                );
+                predicates.add(cb.equal(root.get("usuarioId"), filtro.getUsuarioId()));
             }
 
-            if (filtro.getFechaDesde() != null) {
-                predicates.add(
-                    cb.greaterThanOrEqualTo(
-                        root.get("fechaApertura"), 
-                        filtro.getFechaDesde()
-                    )
-                );
+            if (filtro.getFechaAperturaDesde() != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("fechaApertura"), filtro.getFechaAperturaDesde().atStartOfDay()));
             }
 
-            if (filtro.getFechaHasta() != null) {
-                predicates.add(
-                    cb.lessThanOrEqualTo(
-                        root.get("fechaApertura"), 
-                        filtro.getFechaHasta()
-                    )
-                );
+            if (filtro.getFechaAperturaHasta() != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("fechaApertura"), filtro.getFechaAperturaHasta().atTime(23, 59, 59)));
             }
 
-            return cb.and(
-                predicates.toArray(new javax.persistence.criteria.Predicate[0])
-            );
+            if (filtro.getFechaCierreDesde() != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("fechaCierre"), filtro.getFechaCierreDesde().atStartOfDay()));
+            }
+
+            if (filtro.getFechaCierreHasta() != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("fechaCierre"), filtro.getFechaCierreHasta().atTime(23, 59, 59)));
+            }
+
+            if (filtro.getConDiferencia() != null) {
+                if (filtro.getConDiferencia()) {
+                    predicates.add(cb.notEqual(root.get("diferencia"), java.math.BigDecimal.ZERO));
+                } else {
+                    predicates.add(cb.equal(root.get("diferencia"), java.math.BigDecimal.ZERO));
+                }
+            }
+
+            return cb.and(predicates.toArray(new javax.persistence.criteria.Predicate[0]));
         };
     }
 }

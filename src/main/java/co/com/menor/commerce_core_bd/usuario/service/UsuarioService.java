@@ -20,4 +20,5 @@ public interface UsuarioService {
     Usuario saveUsuario(CreateUsuarioRequest req);
 
     Usuario updateUsuario(UpdateUsuarioRequest req);
+
 }

@@ -62,14 +62,19 @@ public class UsuarioServiceImpl implements UsuarioService {
     public Usuario updateUsuario(UpdateUsuarioRequest req) {
 
         Optional<Usuario> usuarioOpt = findById(req.getId());
-    
+
         if (!usuarioOpt.isPresent()) {
             log.warn("Usuario no encontrado {}", req.getId());
             return null;
         }
-    
+
         Usuario usuario = usuarioOpt.get();
         usuarioMapper.updateEntityFromRequest(req, usuario);
+        return usuarioRepository.save(usuario);
+    }
+
+    @Override
+    public Usuario save(Usuario usuario) {
         return usuarioRepository.save(usuario);
     }
 }

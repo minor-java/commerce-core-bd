@@ -167,6 +167,16 @@ public class MovimientoServiceImpl implements MovimientoService {
     }
 
     @Override
+    public MovimientoInventarioResponse buscarPorReferenciaYTipo(String referenciaTipo, Long referenciaId) {
+        return movimientoRepository.findByReferenciaTipoAndReferenciaId(referenciaTipo, referenciaId)
+            .map(movimientoInventarioMapper::toResponse)
+            .orElseThrow(() -> new MinorExcepcion(
+                "MOVIMIENTO_NO_ENCONTRADO",
+                "No existe movimiento para referenciaTipo=" + referenciaTipo + " referenciaId=" + referenciaId
+            ));
+    }
+
+    @Override
     public StockActualResponse consultarStock(Long productoId) {
 
         return stockActualService.buscarPorProductoId(productoId)

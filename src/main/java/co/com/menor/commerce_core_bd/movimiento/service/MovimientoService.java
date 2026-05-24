@@ -36,4 +36,6 @@ public interface MovimientoService {
     BigDecimal sumaMovimientosCajaTipo(SumaMovimientoCajaRequest req);
 
     MovimientoCaja guardarMovimientoCaja(MovimientoCaja movCaja);
+
+    MovimientoInventarioResponse buscarPorReferenciaYTipo(String referenciaTipo, Long referenciaId);
 }

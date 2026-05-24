@@ -14,4 +14,5 @@ public interface MovimientoInventarioRepository extends JpaRepository<Movimiento
 
     List<MovimientoInventario> findByProductoIdOrderByFechaCreacionAscIdAsc(Long productoId);
     Optional<MovimientoInventario> findById(Long movimientoId);
+    Optional<MovimientoInventario> findByReferenciaTipoAndReferenciaId(String referenciaTipo, Long referenciaId);
 }

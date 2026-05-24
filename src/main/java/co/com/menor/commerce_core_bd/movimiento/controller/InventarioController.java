@@ -36,6 +36,13 @@ public class InventarioController {
         return ResponseEntity.ok(inventarioService.getMovimientoById(id));
     }
 
+    @GetMapping("/movimiento/por-referencia/{tipo}/{referenciaId}")
+    public ResponseEntity<MovimientoInventarioResponse> buscarPorReferencia(
+            @PathVariable String tipo,
+            @PathVariable Long referenciaId) {
+        return ResponseEntity.ok(inventarioService.buscarPorReferenciaYTipo(tipo, referenciaId));
+    }
+
     @PostMapping("/guardar")
     public ResponseEntity<MovimientoInventarioResponse> guardar(
             @RequestBody CreateMovimientoInventarioRequest request

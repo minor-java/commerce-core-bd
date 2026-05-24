@@ -78,7 +78,9 @@ public class CajaServiceImpl implements CajaService {
         Caja caja = cajaRepository.findById(id)
         .orElse(null);
 
-        return cajaMapper.toResponse(caja);
+        if (caja == null) return null;
+        String usuario = resolverNombreUsuario(caja.getUsuarioId(), new HashMap<>());
+        return cajaMapper.toPaginadoResponse(caja, usuario);
     }
 
     @Override

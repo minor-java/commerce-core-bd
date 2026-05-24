@@ -222,6 +222,12 @@ public class VentaServiceImpl implements VentaService {
     private Specification<Venta> buildSpec(FiltroVentaRequest filtro) {
         return (root, query, cb) -> {
             java.util.List<javax.persistence.criteria.Predicate> predicates = new java.util.ArrayList<>();
+            if (filtro.getCajaId() != null) {
+                predicates.add(cb.equal(root.get("cajaId"), filtro.getCajaId()));
+            }
+            if (filtro.getId() != null) {
+                predicates.add(cb.equal(root.get("id"), filtro.getId()));
+            }
             if (filtro.getUsuarioId() != null) {
                 predicates.add(cb.equal(root.get("usuarioId"), filtro.getUsuarioId()));
             }
@@ -230,6 +236,9 @@ public class VentaServiceImpl implements VentaService {
             }
             if (filtro.getFechaHasta() != null) {
                 predicates.add(cb.lessThanOrEqualTo(root.get("fechaCreacion"), filtro.getFechaHasta()));
+            }
+            if (filtro.getTotal() != null) {
+                predicates.add(cb.equal(root.get("total"), filtro.getTotal()));
             }
             return cb.and(predicates.toArray(new javax.persistence.criteria.Predicate[0]));
         };

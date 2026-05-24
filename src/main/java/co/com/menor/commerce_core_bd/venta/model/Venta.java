@@ -27,4 +27,7 @@ public class Venta {
 
     @Column(name = "usuario_id", nullable = false)
     private Long usuarioId;
+
+    @Column(name = "caja_id")
+    private Long cajaId;
 }

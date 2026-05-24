@@ -15,6 +15,7 @@ public class VentaMapper {
         if (req == null) return null;
         Venta venta = new Venta();
         venta.setUsuarioId(req.getUsuarioId());
+        venta.setCajaId(req.getCajaId());
         venta.setFechaCreacion(LocalDateTime.now());
         return venta;
     }

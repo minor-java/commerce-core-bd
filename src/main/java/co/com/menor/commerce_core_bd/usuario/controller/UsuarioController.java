@@ -52,10 +52,10 @@ public class UsuarioController {
 
     @GetMapping("/consulta-usuario-por-id/{id}")
     public ResponseEntity<UsuarioResponse> buscarPorUsuario(
-        @PathVariable Long usuario
+        @PathVariable("id") Long id
     ) {
 
-        return usuarioService.findById(usuario)
+        return usuarioService.findById(id)
             .map(u -> ResponseEntity.ok(usuarioResponseMapper.toResponse(u)))
             .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }

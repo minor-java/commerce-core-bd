@@ -4,8 +4,10 @@ import co.com.menor.comun_dto.caja.request.AbrirCajaRequest;
 import co.com.menor.comun_dto.caja.request.CerrarCajaRequest;
 import co.com.menor.comun_dto.caja.request.FiltroCajaRequest;
 import co.com.menor.comun_dto.caja.response.CajaResponse;
+import co.com.menor.comun_dto.caja.response.MovimientoCajaResponse;
 
 import org.springframework.data.domain.Page;
+import java.util.List;
 
 public interface CajaService {
 
@@ -22,5 +24,7 @@ public interface CajaService {
     Page<CajaResponse> buscarPaginado(FiltroCajaRequest filtro);
 
     CajaResponse obtenerPorUsuarioIdPorEstado(Long usuarioId);
+
+    List<MovimientoCajaResponse> consultarMovimientosPorCajaId(Long cajaId);
 
 }

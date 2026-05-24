@@ -3,11 +3,13 @@ package co.com.menor.commerce_core_bd.caja.service;
 import co.com.menor.commerce_core_bd.caja.mapper.CajaMapper;
 import co.com.menor.commerce_core_bd.caja.model.Caja;
 import co.com.menor.commerce_core_bd.caja.repository.CajaRepository;
+import co.com.menor.commerce_core_bd.movimiento.repository.MovimientoCajaRepository;
 import co.com.menor.commerce_core_bd.usuario.service.UsuarioService;
 import co.com.menor.comun_dto.caja.request.AbrirCajaRequest;
 import co.com.menor.comun_dto.caja.request.CerrarCajaRequest;
 import co.com.menor.comun_dto.caja.request.FiltroCajaRequest;
 import co.com.menor.comun_dto.caja.response.CajaResponse;
+import co.com.menor.comun_dto.caja.response.MovimientoCajaResponse;
 import co.com.menor.comun_dto.utils.CajaConstants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +20,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -28,6 +32,7 @@ public class CajaServiceImpl implements CajaService {
     private final CajaRepository cajaRepository;
     private final CajaMapper cajaMapper;
     private final UsuarioService usuarioService;
+    private final MovimientoCajaRepository movimientoCajaRepository;
 
     @Override
     @Transactional
@@ -117,6 +122,15 @@ public class CajaServiceImpl implements CajaService {
             String usuario = resolverNombreUsuario(caja.getUsuarioId(), usuarioCache);
             return cajaMapper.toPaginadoResponse(caja, usuario);
         });
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<MovimientoCajaResponse> consultarMovimientosPorCajaId(Long cajaId) {
+        return movimientoCajaRepository.findByCajaId(cajaId)
+            .stream()
+            .map(cajaMapper::toMovimientoResponse)
+            .collect(Collectors.toList());
     }
 
     private String resolverNombreUsuario(Long usuarioId, Map<Long, String> cache) {

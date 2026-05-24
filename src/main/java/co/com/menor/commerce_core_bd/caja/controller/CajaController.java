@@ -5,6 +5,7 @@ import co.com.menor.comun_dto.caja.request.AbrirCajaRequest;
 import co.com.menor.comun_dto.caja.request.CerrarCajaRequest;
 import co.com.menor.comun_dto.caja.request.FiltroCajaRequest;
 import co.com.menor.comun_dto.caja.response.CajaResponse;
+import co.com.menor.comun_dto.caja.response.MovimientoCajaResponse;
 import co.com.menor.comun_dto.paginacion.PaginadoResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -12,6 +13,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/caja")
@@ -56,6 +59,11 @@ public class CajaController {
     @GetMapping("/tiene-caja-activa/{usuarioId}")
     public ResponseEntity<Boolean> tieneCajaActiva(@PathVariable Long usuarioId) {
         return ResponseEntity.ok(cajaService.tieneCajaActiva(usuarioId));
+    }
+
+    @GetMapping("/{id}/movimientos")
+    public ResponseEntity<List<MovimientoCajaResponse>> consultarMovimientos(@PathVariable Long id) {
+        return ResponseEntity.ok(cajaService.consultarMovimientosPorCajaId(id));
     }
 
     @PostMapping("/paginado")

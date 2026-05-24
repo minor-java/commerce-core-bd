@@ -24,6 +24,11 @@ public class ReversoController {
         .body(reversoService.crearReverso(request));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ReversoResponse> obtenerPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(reversoService.obtenerPorId(id));
+    }
+
     @GetMapping("/cantidad-reversada/{movimientoId}")
     public ResponseEntity<BigDecimal> getCantidadReversada(@PathVariable Long movimientoId) {
         return ResponseEntity.ok(reversoService.getCantidadReversada(movimientoId));

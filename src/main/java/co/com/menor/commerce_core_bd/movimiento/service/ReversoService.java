@@ -10,4 +10,6 @@ public interface ReversoService {
     ReversoResponse crearReverso(ReversoRequest req);
 
     BigDecimal getCantidadReversada(Long movimientoId);
+
+    ReversoResponse obtenerPorId(Long id);
 }

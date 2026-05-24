@@ -96,6 +96,13 @@ public class ReversoServiceImpl implements ReversoService {
         return total != null ? total : BigDecimal.ZERO;
     }
 
+    @Override
+    public ReversoResponse obtenerPorId(Long id) {
+        return reversoRepository.findById(id)
+            .map(reversoMapper::toResponse)
+            .orElseThrow(() -> new MinorExcepcion("NOT_FOUND", "Reverso no encontrado con id=" + id));
+    }
+
     private void registrarMovimientoCajaReversoVenta(
         Long reversoId,
         Long referenciaId,

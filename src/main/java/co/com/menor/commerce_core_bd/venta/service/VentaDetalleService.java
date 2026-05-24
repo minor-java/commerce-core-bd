@@ -12,4 +12,6 @@ public interface VentaDetalleService {
     List<VentaDetalle> buscarPorVentaId(Long id);
 
     Optional<VentaDetalle> buscarPorId(Long id);
+
+    List<VentaDetalle> buscarPorVentaIds(List<Long> ventaIds);
 }

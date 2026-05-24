@@ -34,4 +34,10 @@ public class VentaDetalleServiceImpl implements VentaDetalleService {
 
         return ventaDetalleRepository.findById(id);
     }
+
+    @Override
+    public List<VentaDetalle> buscarPorVentaIds(List<Long> ventaIds) {
+
+        return ventaDetalleRepository.findByVentaIdIn(ventaIds);
+    }
 }

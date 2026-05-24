@@ -1,5 +1,7 @@
 package co.com.menor.commerce_core_bd.venta.controller;
 
+import co.com.menor.commerce_core_bd.venta.dto.TopProductoResponse;
+import co.com.menor.commerce_core_bd.venta.dto.UltimaVentaResponse;
 import co.com.menor.commerce_core_bd.venta.service.VentaService;
 import co.com.menor.comun_dto.paginacion.PaginadoResponse;
 import co.com.menor.comun_dto.venta.request.FiltroVentaRequest;
@@ -10,6 +12,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/venta")
@@ -40,5 +45,30 @@ public class VentaController {
                 page.getTotalPages()
         );
         return ResponseEntity.ok(respuesta);
+    }
+
+    @GetMapping("/total-vendido-mes")
+    public ResponseEntity<BigDecimal> totalVendidoMes() {
+        return ResponseEntity.ok(ventaService.getTotalVendidoMes());
+    }
+
+    @GetMapping("/cantidad-ventas-mes")
+    public ResponseEntity<Long> cantidadVentasMes() {
+        return ResponseEntity.ok(ventaService.getCantidadVentasMes());
+    }
+
+    @GetMapping("/total-vendido-hoy")
+    public ResponseEntity<BigDecimal> totalVendidoHoy() {
+        return ResponseEntity.ok(ventaService.getTotalVendidoHoy());
+    }
+
+    @GetMapping("/ultimas-ventas")
+    public ResponseEntity<List<UltimaVentaResponse>> ultimasVentas() {
+        return ResponseEntity.ok(ventaService.getUltimasVentas());
+    }
+
+    @GetMapping("/top-productos-mes")
+    public ResponseEntity<List<TopProductoResponse>> topProductosMes() {
+        return ResponseEntity.ok(ventaService.getTopProductosMes());
     }
 }

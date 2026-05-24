@@ -13,4 +13,6 @@ public interface VentaDetalleRepository extends JpaRepository<VentaDetalle, Long
     List<VentaDetalle> findByVentaId(Long ventaId);
 
     Optional<VentaDetalle> findById(Long id);
+
+    List<VentaDetalle> findByVentaIdIn(List<Long> ventaIds);
 }

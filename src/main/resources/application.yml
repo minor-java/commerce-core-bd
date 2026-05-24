@@ -12,3 +12,8 @@ spring:
     info:
         build:
             encoding: UTF-8
+
+security-core:
+  secret: MiClaveSecretaLocalDefault1234567890123456
+  public-paths:
+    - /auth/login

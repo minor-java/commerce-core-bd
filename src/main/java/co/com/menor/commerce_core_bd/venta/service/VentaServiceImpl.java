@@ -1,10 +1,14 @@
 package co.com.menor.commerce_core_bd.venta.service;
 
 import co.com.menor.commerce_core_bd.caja.model.MovimientoCaja;
+import co.com.menor.commerce_core_bd.catalogo.model.Producto;
+import co.com.menor.commerce_core_bd.catalogo.repository.ProductoRepository;
 import co.com.menor.commerce_core_bd.movimiento.model.MovimientoInventario;
 import co.com.menor.commerce_core_bd.movimiento.service.MovimientoService;
 import co.com.menor.commerce_core_bd.movimiento.service.StockActualService;
 import co.com.menor.commerce_core_bd.shared.exception.MinorExcepcion;
+import co.com.menor.commerce_core_bd.venta.dto.TopProductoResponse;
+import co.com.menor.commerce_core_bd.venta.dto.UltimaVentaResponse;
 import co.com.menor.commerce_core_bd.venta.mapper.VentaMapper;
 import co.com.menor.commerce_core_bd.venta.mapper.VentaResponseMapper;
 import co.com.menor.commerce_core_bd.venta.model.Venta;
@@ -24,8 +28,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -35,13 +44,14 @@ public class VentaServiceImpl implements VentaService {
 
     private final VentaRepository ventaRepository;
     private final VentaDetalleService ventaDetalleService;
-    
+
     private final MovimientoService movimientoService;
-    
+
     private final VentaMapper ventaMapper;
     private final VentaResponseMapper ventaResponseMapper;
-    
+
     private final StockActualService stockActualService;
+    private final ProductoRepository productoRepository;
 
     @Override
     @Transactional
@@ -124,6 +134,89 @@ public class VentaServiceImpl implements VentaService {
         Specification<Venta> spec = buildSpec(filtro);
         return ventaRepository.findAll(spec, pageable)
                 .map(v -> ventaResponseMapper.toResponse(v, ventaDetalleService.buscarPorVentaId(v.getId())));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public BigDecimal getTotalVendidoMes() {
+        LocalDateTime inicio = LocalDateTime.of(LocalDate.now().withDayOfMonth(1), LocalTime.MIN);
+        LocalDateTime fin = LocalDateTime.now();
+        BigDecimal total = ventaRepository.sumTotalByFechaCreacionBetween(inicio, fin);
+        return total != null ? total : BigDecimal.ZERO;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Long getCantidadVentasMes() {
+        LocalDateTime inicio = LocalDateTime.of(LocalDate.now().withDayOfMonth(1), LocalTime.MIN);
+        LocalDateTime fin = LocalDateTime.now();
+        return ventaRepository.countByFechaCreacionBetween(inicio, fin);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public BigDecimal getTotalVendidoHoy() {
+        LocalDateTime inicio = LocalDateTime.of(LocalDate.now(), LocalTime.MIN);
+        LocalDateTime fin = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);
+        BigDecimal total = ventaRepository.sumTotalByFechaCreacionBetween(inicio, fin);
+        return total != null ? total : BigDecimal.ZERO;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<UltimaVentaResponse> getUltimasVentas() {
+        LocalDateTime inicio = LocalDateTime.of(LocalDate.now().withDayOfMonth(1), LocalTime.MIN);
+        LocalDateTime fin = LocalDateTime.now();
+        return ventaRepository.findTop5ByFechaCreacionBetweenOrderByIdDesc(inicio, fin)
+                .stream()
+                .map(v -> new UltimaVentaResponse(
+                        v.getId(),
+                        v.getTotal(),
+                        v.getFechaCreacion(),
+                        ventaDetalleService.buscarPorVentaId(v.getId()).size()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TopProductoResponse> getTopProductosMes() {
+        LocalDateTime inicio = LocalDateTime.of(LocalDate.now().withDayOfMonth(1), LocalTime.MIN);
+        LocalDateTime fin = LocalDateTime.now();
+
+        List<Long> ventaIds = ventaRepository.findByFechaCreacionBetween(inicio, fin)
+                .stream().map(Venta::getId).collect(Collectors.toList());
+
+        if (ventaIds.isEmpty()) return Collections.emptyList();
+
+        Map<Long, BigDecimal[]> mapa = new HashMap<>();
+        for (VentaDetalle d : ventaDetalleService.buscarPorVentaIds(ventaIds)) {
+            BigDecimal[] acum = mapa.computeIfAbsent(d.getProductoId(),
+                    k -> new BigDecimal[]{BigDecimal.ZERO, BigDecimal.ZERO});
+            acum[0] = acum[0].add(d.getCantidad());
+            acum[1] = acum[1].add(d.getSubtotal());
+        }
+
+        return mapa.entrySet().stream()
+                .sorted((a, b) -> b.getValue()[0].compareTo(a.getValue()[0]))
+                .limit(3)
+                .map(e -> {
+                    String nombre = productoRepository.findById(e.getKey())
+                            .map(this::buildNombreProducto)
+                            .orElse("Producto #" + e.getKey());
+                    return new TopProductoResponse(e.getKey(), nombre, e.getValue()[0], e.getValue()[1]);
+                })
+                .collect(Collectors.toList());
+    }
+
+    private String buildNombreProducto(Producto p) {
+        StringBuilder sb = new StringBuilder(p.getNombre());
+        if (p.getPresentacionValor() != null) {
+            sb.append(" ").append(p.getPresentacionValor().stripTrailingZeros().toPlainString());
+        }
+        if (p.getPresentacionUnidad() != null) {
+            sb.append(p.getPresentacionUnidad());
+        }
+        return sb.toString();
     }
 
     private Specification<Venta> buildSpec(FiltroVentaRequest filtro) {

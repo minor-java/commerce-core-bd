@@ -31,14 +31,14 @@ public class CajaServiceImpl implements CajaService {
 
     @Override
     @Transactional
-    public CajaResponse abrirCaja(AbrirCajaRequest req) {        
-        
+    public CajaResponse abrirCaja(AbrirCajaRequest req) {
+
         Caja caja = cajaMapper.toEntityApertura(req);
         Caja guardada = cajaRepository.save(caja);
-        
+
         log.info(
-            "abrirCaja: caja id={} usuario={}", 
-            guardada.getId(), 
+            "abrirCaja: caja id={} usuario={}",
+            guardada.getId(),
             req.getUsuarioId()
         );
 
@@ -50,7 +50,7 @@ public class CajaServiceImpl implements CajaService {
     public CajaResponse cerrarCaja(CerrarCajaRequest req) {
 
         Caja caja = cajaRepository.findById(req.getCajaId()).get();
-            
+
         caja.setEstado(req.getEstado());
         caja.setFechaCierre(req.getFechaCierre());
         caja.setMontoCierreReal(req.getMontoCierreReal());
@@ -63,8 +63,8 @@ public class CajaServiceImpl implements CajaService {
 
         log.info(
             "cerrarCaja: caja id={} saldoEsperado={} diferencia={}",
-            guardada.getId(), 
-            guardada.getSaldoEsperado(), 
+            guardada.getId(),
+            guardada.getSaldoEsperado(),
             guardada.getDiferencia()
         );
 
@@ -74,7 +74,7 @@ public class CajaServiceImpl implements CajaService {
     @Override
     @Transactional(readOnly = true)
     public CajaResponse obtenerPorCajaId(Long id) {
-        
+
         Caja caja = cajaRepository.findById(id)
         .orElse(null);
 

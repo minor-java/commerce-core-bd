@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,7 +36,9 @@ public class AuthServiceImpl implements AuthService {
             throw new MinorExcepcion("USUARIO_INACTIVO", "Usuario inactivo");
         }
 
-        if (!passwordEncoder.matches(request.getContrasena(), usuario.getContrasena())) {
+        String contrasena = new String(Base64.getDecoder().decode(request.getContrasena()));
+
+        if (!passwordEncoder.matches(contrasena, usuario.getContrasena())) {
             int intentos = usuario.getIntentos() != null ? usuario.getIntentos() : 0;
             usuario.setIntentos(intentos + 1);
             usuarioService.save(usuario);

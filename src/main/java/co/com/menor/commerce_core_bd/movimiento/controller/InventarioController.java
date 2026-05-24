@@ -83,6 +83,11 @@ public class InventarioController {
         return ResponseEntity.ok(inventarioService.consultarStock(productoId));
     }
 
+    @GetMapping("/stock/consulta-por-producto-id/{productoId}")
+    public ResponseEntity<StockActualResponse> consultarStockPorProductoId(@PathVariable Long productoId) {
+        return ResponseEntity.ok(inventarioService.consultarStock(productoId));
+    }
+
     @PostMapping("/stock/paginado")
     public ResponseEntity<PaginadoResponse<StockPaginadoResponse>> obtenerStockPaginado(
         @RequestBody(required = false) FiltroStockRequest filtro

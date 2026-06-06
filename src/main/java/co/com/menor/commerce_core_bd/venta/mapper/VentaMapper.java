@@ -16,6 +16,8 @@ public class VentaMapper {
         Venta venta = new Venta();
         venta.setUsuarioId(req.getUsuarioId());
         venta.setCajaId(req.getCajaId());
+        venta.setMetodoPago(req.getMetodoPago());
+        venta.setReceptorNombre(req.getReceptorNombre());
         venta.setFechaCreacion(LocalDateTime.now());
         return venta;
     }
@@ -24,6 +26,7 @@ public class VentaMapper {
         if (req == null) return null;
         VentaDetalle detalle = new VentaDetalle();
         detalle.setProductoId(req.getProductoId());
+        detalle.setComboId(req.getComboId());
         detalle.setVentaId(ventaId);
         detalle.setCantidad(req.getCantidad());
         detalle.setPrecioUnitario(req.getPrecioUnitario());

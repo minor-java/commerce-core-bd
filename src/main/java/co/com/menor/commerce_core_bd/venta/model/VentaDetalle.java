@@ -18,8 +18,11 @@ public class VentaDetalle {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "producto_id", nullable = false)
+    @Column(name = "producto_id")
     private Long productoId;
+
+    @Column(name = "combo_id")
+    private Long comboId;
 
     @Column(name = "venta_id", nullable = false)
     private Long ventaId;

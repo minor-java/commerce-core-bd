@@ -22,6 +22,10 @@ public interface CodigoBarraRepository extends JpaRepository<CodigoBarra, Long> 
     
     List<CodigoBarra> findByProductoId(Long productoId);
 
+    List<CodigoBarra> findByComboId(Long comboId);
+
+    void deleteByComboId(Long comboId);
+
     @Modifying
     @Transactional
     @Query("DELETE FROM CodigoBarra c WHERE c.id = :id")

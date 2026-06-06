@@ -13,5 +13,7 @@ public interface CodigoBarrasService {
     boolean existsCodigoBarras(String codigoBarras);
     Optional<CodigoBarra> findByCodigo(String codigoBarras);
     List<CodigoBarra> findByProductoId(Long productoId);
+    List<CodigoBarra> findByComboId(Long comboId);
     void deleteByIds(EliminarCodigosBarrasRequest codigoBarras);
+    void deleteByComboId(Long comboId);
 }

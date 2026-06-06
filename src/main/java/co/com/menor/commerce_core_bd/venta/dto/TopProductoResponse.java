@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class TopProductoResponse {
     private Long productoId;
+    private Long comboId;
     private String nombre;
     private BigDecimal cantidadVendida;
     private BigDecimal totalVendido;

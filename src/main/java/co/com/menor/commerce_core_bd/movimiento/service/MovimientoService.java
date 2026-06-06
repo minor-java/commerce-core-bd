@@ -11,6 +11,7 @@ import co.com.menor.comun_dto.inventario.response.StockActualResponse;
 import co.com.menor.comun_dto.inventario.response.StockPaginadoResponse;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -38,4 +39,6 @@ public interface MovimientoService {
     MovimientoCaja guardarMovimientoCaja(MovimientoCaja movCaja);
 
     MovimientoInventarioResponse buscarPorReferenciaYTipo(String referenciaTipo, Long referenciaId);
+
+    List<MovimientoInventario> buscarTodosPorReferenciaYTipo(String referenciaTipo, Long referenciaId);
 }

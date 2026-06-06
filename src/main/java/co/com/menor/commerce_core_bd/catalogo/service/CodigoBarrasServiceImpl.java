@@ -57,13 +57,28 @@ public class CodigoBarrasServiceImpl implements CodigoBarrasService {
     @Override
     public List<CodigoBarra> findByProductoId(Long productoId) {
         try {
-            
             return codigoBarraRepository.findByProductoId(productoId);
         } catch (Exception e) {
-            throw new MinorExcepcion(
-                "ERROR",
-                "CodigoBarrasService findByProductoId"
-            );
+            throw new MinorExcepcion("ERROR", "CodigoBarrasService findByProductoId");
+        }
+    }
+
+    @Override
+    public List<CodigoBarra> findByComboId(Long comboId) {
+        try {
+            return codigoBarraRepository.findByComboId(comboId);
+        } catch (Exception e) {
+            throw new MinorExcepcion("ERROR", "CodigoBarrasService findByComboId");
+        }
+    }
+
+    @Override
+    @Transactional
+    public void deleteByComboId(Long comboId) {
+        try {
+            codigoBarraRepository.deleteByComboId(comboId);
+        } catch (Exception e) {
+            throw new MinorExcepcion("ERROR", "CodigoBarrasService deleteByComboId");
         }
     }
 

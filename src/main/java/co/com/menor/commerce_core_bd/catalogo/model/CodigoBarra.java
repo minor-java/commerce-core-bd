@@ -24,8 +24,11 @@ public class CodigoBarra {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long Id;
 
-    @Column(name = "producto_id", nullable = false)
+    @Column(name = "producto_id", nullable = true)
     private Long productoId;
+
+    @Column(name = "combo_id", nullable = true)
+    private Long comboId;
 
     @Column(nullable = false, unique = true)
     private String codigo;

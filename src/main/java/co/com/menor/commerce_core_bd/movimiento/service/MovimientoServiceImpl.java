@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -174,6 +175,11 @@ public class MovimientoServiceImpl implements MovimientoService {
                 "MOVIMIENTO_NO_ENCONTRADO",
                 "No existe movimiento para referenciaTipo=" + referenciaTipo + " referenciaId=" + referenciaId
             ));
+    }
+
+    @Override
+    public List<MovimientoInventario> buscarTodosPorReferenciaYTipo(String referenciaTipo, Long referenciaId) {
+        return movimientoRepository.findAllByReferenciaTipoAndReferenciaId(referenciaTipo, referenciaId);
     }
 
     @Override

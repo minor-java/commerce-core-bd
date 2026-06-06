@@ -30,4 +30,10 @@ public class Venta {
 
     @Column(name = "caja_id")
     private Long cajaId;
+
+    @Column(name = "metodo_pago", length = 30)
+    private String metodoPago;
+
+    @Column(name = "receptor_nombre", length = 200)
+    private String receptorNombre;
 }

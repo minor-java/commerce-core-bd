@@ -15,6 +15,7 @@ public class CodigoBarraResponseMapper {
         return CodigoBarraResponse.builder()
             .id(codigoBarra.getId())
             .productoId(codigoBarra.getProductoId())
+            .comboId(codigoBarra.getComboId())
             .codigo(codigoBarra.getCodigo())
             .tipo(codigoBarra.getTipo())
             .principal(codigoBarra.isPrincipal())

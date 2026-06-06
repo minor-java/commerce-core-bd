@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -24,4 +25,11 @@ public interface MovimientoCajaRepository extends JpaRepository<MovimientoCaja, 
     @Query("SELECT COALESCE(SUM(m.monto), 0) FROM MovimientoCaja m " +
            "WHERE m.cajaId = :cajaId AND m.tipo = :tipo")
     BigDecimal sumMontoByCajaIdAndTipo(@Param("cajaId") Long cajaId, @Param("tipo") String tipo);
+
+    @Query("SELECT COALESCE(SUM(m.monto), 0) FROM MovimientoCaja m " +
+           "WHERE m.referenciaTipo = :referenciaTipo AND m.fechaCreacion BETWEEN :inicio AND :fin")
+    BigDecimal sumMontoByReferenciaTipoAndFechaCreacionBetween(
+            @Param("referenciaTipo") String referenciaTipo,
+            @Param("inicio") LocalDateTime inicio,
+            @Param("fin") LocalDateTime fin);
 }

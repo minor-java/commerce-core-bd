@@ -27,8 +27,11 @@ public class PrecioHistorico {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "producto_id", nullable = false)
+    @Column(name = "producto_id", nullable = true)
     private Long productoId;
+
+    @Column(name = "combo_id", nullable = true)
+    private Long comboId;
 
     @Column(name = "precio_anterior", nullable = true, precision = 14, scale = 2)
     private BigDecimal precioAnterior;

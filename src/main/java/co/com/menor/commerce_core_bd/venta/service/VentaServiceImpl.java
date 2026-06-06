@@ -3,6 +3,8 @@ package co.com.menor.commerce_core_bd.venta.service;
 import co.com.menor.commerce_core_bd.caja.model.MovimientoCaja;
 import co.com.menor.commerce_core_bd.catalogo.model.Producto;
 import co.com.menor.commerce_core_bd.catalogo.repository.ProductoRepository;
+import co.com.menor.commerce_core_bd.combo.repository.ComboDetalleRepository;
+import co.com.menor.commerce_core_bd.combo.repository.ComboRepository;
 import co.com.menor.commerce_core_bd.movimiento.model.MovimientoInventario;
 import co.com.menor.commerce_core_bd.movimiento.service.MovimientoService;
 import co.com.menor.commerce_core_bd.movimiento.service.StockActualService;
@@ -52,6 +54,8 @@ public class VentaServiceImpl implements VentaService {
 
     private final StockActualService stockActualService;
     private final ProductoRepository productoRepository;
+    private final ComboDetalleRepository comboDetalleRepository;
+    private final ComboRepository comboRepository;
 
     @Override
     @Transactional
@@ -69,26 +73,19 @@ public class VentaServiceImpl implements VentaService {
         List<VentaDetalle> detallesGuardados = ventaDetalleService.guardarTodo(detalles);
 
         detallesGuardados.forEach(detalle -> {
-            
-            BigDecimal costoUnitario = 
-            stockActualService.buscarPorProductoId(detalle.getProductoId())
-            .map(s -> s.getCostoPromedio())
-                .orElse(BigDecimal.ZERO);
-
-            MovimientoInventario movimiento = new MovimientoInventario();
-
-            movimiento.setProductoId(detalle.getProductoId());
-            movimiento.setTipo(MovimientoInventarioConstants.TIPO_SALIDA);
-            movimiento.setCantidad(detalle.getCantidad());
-            movimiento.setCostoUnitario(costoUnitario);
-            movimiento.setCostoTotal(detalle.getCantidad().multiply(costoUnitario));
-            movimiento.setReferenciaTipo(MovimientoInventarioConstants.REFERENCIA_VENTA_DETALLE);
-            movimiento.setReferenciaId(detalle.getId());
-            movimiento.setFechaCreacion(LocalDateTime.now());
-            movimiento.setUsuarioId(req.getUsuarioId());
-
-            movimientoService.guardarMovimiento(movimiento);
-            stockActualService.actualizarStock(movimiento);
+            if (detalle.getComboId() != null) {
+                comboDetalleRepository.findByComboId(detalle.getComboId()).forEach(item -> {
+                    BigDecimal cantidadTotal = item.getCantidad().multiply(detalle.getCantidad());
+                    registrarSalida(item.getProductoId(), cantidadTotal, detalle.getId(), req.getUsuarioId());
+                });
+                comboRepository.findById(detalle.getComboId()).ifPresent(combo -> {
+                    int nueva = Math.max(0, combo.getCantidadDisponible() - detalle.getCantidad().intValue());
+                    combo.setCantidadDisponible(nueva);
+                    comboRepository.save(combo);
+                });
+            } else {
+                registrarSalida(detalle.getProductoId(), detalle.getCantidad(), detalle.getId(), req.getUsuarioId());
+            }
         });
 
         BigDecimal total = detallesGuardados.stream()
@@ -188,10 +185,18 @@ public class VentaServiceImpl implements VentaService {
 
         if (ventaIds.isEmpty()) return Collections.emptyList();
 
-        Map<Long, BigDecimal[]> mapa = new HashMap<>();
+        // Keys: "P_<productoId>" for individual products, "C_<comboId>" for combos
+        Map<String, BigDecimal[]> mapa = new HashMap<>();
         for (VentaDetalle d : ventaDetalleService.buscarPorVentaIds(ventaIds)) {
-            BigDecimal[] acum = mapa.computeIfAbsent(d.getProductoId(),
-                    k -> new BigDecimal[]{BigDecimal.ZERO, BigDecimal.ZERO});
+            String key;
+            if (d.getComboId() != null) {
+                key = "C_" + d.getComboId();
+            } else if (d.getProductoId() != null) {
+                key = "P_" + d.getProductoId();
+            } else {
+                continue;
+            }
+            BigDecimal[] acum = mapa.computeIfAbsent(key, k -> new BigDecimal[]{BigDecimal.ZERO, BigDecimal.ZERO});
             acum[0] = acum[0].add(d.getCantidad());
             acum[1] = acum[1].add(d.getSubtotal());
         }
@@ -200,12 +205,42 @@ public class VentaServiceImpl implements VentaService {
                 .sorted((a, b) -> b.getValue()[0].compareTo(a.getValue()[0]))
                 .limit(3)
                 .map(e -> {
-                    String nombre = productoRepository.findById(e.getKey())
-                            .map(this::buildNombreProducto)
-                            .orElse("Producto #" + e.getKey());
-                    return new TopProductoResponse(e.getKey(), nombre, e.getValue()[0], e.getValue()[1]);
+                    String key = e.getKey();
+                    if (key.startsWith("C_")) {
+                        Long comboId = Long.parseLong(key.substring(2));
+                        String nombre = comboRepository.findById(comboId)
+                                .map(Combo -> Combo.getNombre())
+                                .orElse("Combo #" + comboId);
+                        return new TopProductoResponse(null, comboId, nombre, e.getValue()[0], e.getValue()[1]);
+                    } else {
+                        Long productoId = Long.parseLong(key.substring(2));
+                        String nombre = productoRepository.findById(productoId)
+                                .map(this::buildNombreProducto)
+                                .orElse("Producto #" + productoId);
+                        return new TopProductoResponse(productoId, null, nombre, e.getValue()[0], e.getValue()[1]);
+                    }
                 })
                 .collect(Collectors.toList());
+    }
+
+    private void registrarSalida(Long productoId, BigDecimal cantidad, Long referenciaId, Long usuarioId) {
+        BigDecimal costoUnitario = stockActualService.buscarPorProductoId(productoId)
+                .map(s -> s.getCostoPromedio())
+                .orElse(BigDecimal.ZERO);
+
+        MovimientoInventario movimiento = new MovimientoInventario();
+        movimiento.setProductoId(productoId);
+        movimiento.setTipo(MovimientoInventarioConstants.TIPO_SALIDA);
+        movimiento.setCantidad(cantidad);
+        movimiento.setCostoUnitario(costoUnitario);
+        movimiento.setCostoTotal(cantidad.multiply(costoUnitario));
+        movimiento.setReferenciaTipo(MovimientoInventarioConstants.REFERENCIA_VENTA_DETALLE);
+        movimiento.setReferenciaId(referenciaId);
+        movimiento.setFechaCreacion(LocalDateTime.now());
+        movimiento.setUsuarioId(usuarioId);
+
+        movimientoService.guardarMovimiento(movimiento);
+        stockActualService.actualizarStock(movimiento);
     }
 
     private String buildNombreProducto(Producto p) {

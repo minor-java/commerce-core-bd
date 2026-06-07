@@ -3,19 +3,25 @@ package co.com.menor.commerce_core_bd.movimiento.service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import co.com.menor.commerce_core_bd.catalogo.model.CodigoBarra;
+import co.com.menor.commerce_core_bd.catalogo.repository.CodigoBarraRepository;
 import co.com.menor.commerce_core_bd.movimiento.model.MovimientoInventario;
 import co.com.menor.commerce_core_bd.movimiento.model.StockActual;
 import co.com.menor.commerce_core_bd.movimiento.repository.StockActualRepository;
 import co.com.menor.commerce_core_bd.shared.exception.MinorExcepcion;
 import co.com.menor.comun_dto.inventario.request.FiltroStockRequest;
 import co.com.menor.comun_dto.inventario.response.StockPaginadoResponse;
+import co.com.menor.comun_dto.inventario.response.StockResumenResponse;
 import co.com.menor.comun_dto.utils.MovimientoInventarioConstants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 public class StockActualServiceImpl implements StockActualService {
 
     private final StockActualRepository stockActualRepository;
+    private final CodigoBarraRepository codigoBarraRepository;
 
     @Override
     public void actualizarStock(MovimientoInventario movimiento) {
@@ -119,14 +126,36 @@ public class StockActualServiceImpl implements StockActualService {
 
             PageRequest pageable = PageRequest.of(filtro.getPage(), filtro.getSize());
 
-            return stockActualRepository.findStockPaginado(
+            Page<StockPaginadoResponse> pagina = stockActualRepository.findStockPaginado(
                 filtro.getNombre(),
                 filtro.getPresentacionValor(),
                 filtro.getPresentacionUnidad(),
                 filtro.getActivo(),
                 filtro.getPrecioVenta(),
+                filtro.getCodigoBarra(),
                 pageable
             );
+
+            List<Long> ids = pagina.getContent().stream()
+                .map(StockPaginadoResponse::getProductoId)
+                .collect(Collectors.toList());
+
+            if (!ids.isEmpty()) {
+                Map<Long, String> codigosPrincipales = codigoBarraRepository
+                    .findByProductoIdInAndPrincipalTrue(ids)
+                    .stream()
+                    .collect(Collectors.toMap(
+                        CodigoBarra::getProductoId,
+                        CodigoBarra::getCodigo,
+                        (a, b) -> a
+                    ));
+
+                pagina.getContent().forEach(item ->
+                    item.setCodigoBarra(codigosPrincipales.get(item.getProductoId()))
+                );
+            }
+
+            return pagina;
 
         } catch (MinorExcepcion e) {
             throw e;
@@ -134,6 +163,41 @@ public class StockActualServiceImpl implements StockActualService {
             throw new MinorExcepcion(
                 "ERROR",
                 "StockActualService obtenerStockPaginado"
+            );
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public StockResumenResponse obtenerResumen() {
+
+        try {
+
+            Long totalProductos = stockActualRepository.contarTotalProductos();
+            BigDecimal costoTotal = stockActualRepository.calcularCostoTotalInventario();
+            BigDecimal valorVenta = stockActualRepository.calcularValorVentaTotal();
+            Long sinStock = stockActualRepository.contarProductosSinStock();
+            Long activos = stockActualRepository.contarProductosActivos();
+            Long inactivos = stockActualRepository.contarProductosInactivos();
+
+            BigDecimal margen = valorVenta.subtract(costoTotal);
+
+            return StockResumenResponse.builder()
+                .totalProductos(totalProductos)
+                .costoTotalInventario(costoTotal)
+                .valorVentaTotal(valorVenta)
+                .margenBrutoTotal(margen)
+                .productosSinStock(sinStock)
+                .productosActivos(activos)
+                .productosInactivos(inactivos)
+                .build();
+
+        } catch (MinorExcepcion e) {
+            throw e;
+        } catch (Exception e) {
+            throw new MinorExcepcion(
+                "ERROR",
+                "StockActualService obtenerResumen"
             );
         }
     }

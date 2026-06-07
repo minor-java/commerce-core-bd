@@ -19,8 +19,10 @@ public interface CodigoBarraRepository extends JpaRepository<CodigoBarra, Long> 
     boolean existsByCodigo(String codigo);
 
     Optional<CodigoBarra> findByCodigo(String codigo);
-    
+
     List<CodigoBarra> findByProductoId(Long productoId);
+
+    List<CodigoBarra> findByProductoIdInAndPrincipalTrue(List<Long> productoIds);
 
     List<CodigoBarra> findByComboId(Long comboId);
 

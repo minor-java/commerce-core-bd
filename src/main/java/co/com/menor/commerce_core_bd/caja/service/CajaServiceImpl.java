@@ -11,6 +11,7 @@ import co.com.menor.comun_dto.caja.request.FiltroCajaRequest;
 import co.com.menor.comun_dto.caja.response.CajaResponse;
 import co.com.menor.comun_dto.caja.response.MovimientoCajaResponse;
 import co.com.menor.comun_dto.utils.CajaConstants;
+import co.com.menor.commerce_core_bd.shared.exception.MinorExcepcion;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -54,7 +55,9 @@ public class CajaServiceImpl implements CajaService {
     @Transactional
     public CajaResponse cerrarCaja(CerrarCajaRequest req) {
 
-        Caja caja = cajaRepository.findById(req.getCajaId()).get();
+        Caja caja = cajaRepository.findById(req.getCajaId())
+                .orElseThrow(() -> new MinorExcepcion("CAJA_NO_ENCONTRADA",
+                        "No existe una caja con id: " + req.getCajaId()));
 
         caja.setEstado(req.getEstado());
         caja.setFechaCierre(req.getFechaCierre());

@@ -85,49 +85,24 @@ public class CompraServiceImpl implements CompraService {
         } catch (MinorExcepcion e) {
             throw e;
         } catch (Exception e) {
-            throw new MinorExcepcion("ERROR", "CompraService crearCompra");
+            log.error("crearCompra: error inesperado", e);
+            throw new MinorExcepcion("ERROR_INTERNO", "Error al crear la compra. Intente nuevamente.");
         }
     }
 
     @Override
     public CompraResponse obtenerCompraPorId(Long id) {
-        
-        try {
-            
-            Compra compra = compraRepository.findById(id).get();
-            return compraMapper.toResponse(compra);
-        } catch (Exception e) {
-
-            throw new MinorExcepcion(
-                "ERROR",
-                "CompraService obtenerCompraPorId"
-            );
-        }
+        Compra compra = compraRepository.findById(id)
+                .orElseThrow(() -> new MinorExcepcion("COMPRA_NO_ENCONTRADA",
+                        "No existe una compra con id: " + id));
+        return compraMapper.toResponse(compra);
     }
 
     @Override
     public Page<CompraResponse> buscarComprasPaginado(FiltroCompraRequest filtro) {
-        
-        try {
-            
-            PageRequest pageable = PageRequest.of(
-                filtro.getPage(),
-                filtro.getSize()
-            );
-        
-            Page<Compra> page = compraRepository.findAll(
-                CompraSpecification.buildFrom(filtro),
-                pageable
-            );
-        
-            return page.map(compraMapper::toResponse);
-            
-        } catch (Exception e) {
-            throw new MinorExcepcion(
-                "ERROR",
-                "CompraService buscarComprasPaginado"
-            );
-        }
+        PageRequest pageable = PageRequest.of(filtro.getPage(), filtro.getSize());
+        return compraRepository.findAll(CompraSpecification.buildFrom(filtro), pageable)
+                .map(compraMapper::toResponse);
     }
     
 }

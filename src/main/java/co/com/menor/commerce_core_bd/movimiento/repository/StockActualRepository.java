@@ -29,7 +29,12 @@ public interface StockActualRepository extends JpaRepository<StockActual, Long> 
             "AND (:presentacionValor IS NULL OR p.presentacionValor = :presentacionValor) " +
             "AND (:presentacionUnidad IS NULL OR LOWER(p.presentacionUnidad) LIKE CONCAT('%', LOWER(:presentacionUnidad), '%')) " +
             "AND (:activo IS NULL OR p.activo = :activo) " +
-            "AND (:precioVenta IS NULL OR p.precioVenta = :precioVenta)",
+            "AND (:precioVenta IS NULL OR p.precioVenta = :precioVenta) " +
+            "AND (:codigoBarra IS NULL OR EXISTS (" +
+                "SELECT cb FROM CodigoBarra cb " +
+                "WHERE cb.productoId = sa.productoId " +
+                "AND LOWER(cb.codigo) LIKE CONCAT('%', LOWER(:codigoBarra), '%')" +
+            "))",
         countQuery =
             "SELECT COUNT(sa.productoId) " +
             "FROM StockActual sa, Producto p " +
@@ -38,7 +43,12 @@ public interface StockActualRepository extends JpaRepository<StockActual, Long> 
             "AND (:presentacionValor IS NULL OR p.presentacionValor = :presentacionValor) " +
             "AND (:presentacionUnidad IS NULL OR LOWER(p.presentacionUnidad) LIKE CONCAT('%', LOWER(:presentacionUnidad), '%')) " +
             "AND (:activo IS NULL OR p.activo = :activo) " +
-            "AND (:precioVenta IS NULL OR p.precioVenta = :precioVenta)"
+            "AND (:precioVenta IS NULL OR p.precioVenta = :precioVenta) " +
+            "AND (:codigoBarra IS NULL OR EXISTS (" +
+                "SELECT cb FROM CodigoBarra cb " +
+                "WHERE cb.productoId = sa.productoId " +
+                "AND LOWER(cb.codigo) LIKE CONCAT('%', LOWER(:codigoBarra), '%')" +
+            "))"
     )
     Page<StockPaginadoResponse> findStockPaginado(
         @Param("nombre") String nombre,
@@ -46,6 +56,35 @@ public interface StockActualRepository extends JpaRepository<StockActual, Long> 
         @Param("presentacionUnidad") String presentacionUnidad,
         @Param("activo") Boolean activo,
         @Param("precioVenta") BigDecimal precioVenta,
+        @Param("codigoBarra") String codigoBarra,
         Pageable pageable
     );
+
+    @Query("SELECT COUNT(sa.productoId) FROM StockActual sa")
+    Long contarTotalProductos();
+
+    @Query("SELECT COALESCE(SUM(sa.stock * sa.costoPromedio), 0) FROM StockActual sa")
+    BigDecimal calcularCostoTotalInventario();
+
+    @Query(
+        "SELECT COALESCE(SUM(sa.stock * p.precioVenta), 0) " +
+        "FROM StockActual sa, Producto p " +
+        "WHERE p.Id = sa.productoId AND p.precioVenta IS NOT NULL"
+    )
+    BigDecimal calcularValorVentaTotal();
+
+    @Query("SELECT COUNT(sa.productoId) FROM StockActual sa WHERE sa.stock <= 0")
+    Long contarProductosSinStock();
+
+    @Query(
+        "SELECT COUNT(sa.productoId) FROM StockActual sa, Producto p " +
+        "WHERE p.Id = sa.productoId AND p.activo = true"
+    )
+    Long contarProductosActivos();
+
+    @Query(
+        "SELECT COUNT(sa.productoId) FROM StockActual sa, Producto p " +
+        "WHERE p.Id = sa.productoId AND p.activo = false"
+    )
+    Long contarProductosInactivos();
 }

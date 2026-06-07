@@ -28,3 +28,11 @@ security-core:
   secret: ${SECURITY_CORE_SECRET}
   public-paths:
     - /auth/login
+
+logging:
+  file:
+    path: /opt/commerce-core-bd/logs
+  level:
+    root: WARN
+    co.com.menor: INFO
+    org.springframework.web.servlet.DispatcherServlet: INFO

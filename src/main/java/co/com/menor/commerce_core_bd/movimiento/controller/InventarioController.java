@@ -9,6 +9,7 @@ import co.com.menor.comun_dto.inventario.request.FiltroStockRequest;
 import co.com.menor.comun_dto.inventario.response.MovimientoInventarioResponse;
 import co.com.menor.comun_dto.inventario.response.StockActualResponse;
 import co.com.menor.comun_dto.inventario.response.StockPaginadoResponse;
+import co.com.menor.comun_dto.inventario.response.StockResumenResponse;
 import co.com.menor.comun_dto.paginacion.PaginadoResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -110,5 +111,10 @@ public class InventarioController {
         );
 
         return ResponseEntity.ok(respuesta);
+    }
+
+    @GetMapping("/stock/resumen")
+    public ResponseEntity<StockResumenResponse> obtenerResumenStock() {
+        return ResponseEntity.ok(stockActualService.obtenerResumen());
     }
 }

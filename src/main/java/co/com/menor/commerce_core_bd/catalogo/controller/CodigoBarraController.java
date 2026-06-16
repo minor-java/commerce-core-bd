@@ -19,6 +19,8 @@ import co.com.menor.commerce_core_bd.catalogo.service.CodigoBarrasService;
 import co.com.menor.comun_dto.codigo_barras.request.CreateCondigoBarrasRequest;
 import co.com.menor.comun_dto.codigo_barras.request.EliminarCodigosBarrasRequest;
 import co.com.menor.comun_dto.codigo_barras.response.CodigoBarraResponse;
+import co.com.menor.comun_dto.codigo_barras.response.GenerarCodigoBarraResponse;
+import co.com.menor.comun_dto.utils.CodigoBarrasConstants;
 
 @RestController
 @RequestMapping("/codigo-barras")
@@ -40,6 +42,19 @@ public class CodigoBarraController {
         return ResponseEntity
         .status(HttpStatus.ACCEPTED)
         .body(codigoBarraResponseMapper.toResponse(guardado));
+    }
+
+    @PostMapping("/generar")
+    public ResponseEntity<GenerarCodigoBarraResponse> generarCodigo() {
+
+        String codigo = codigoBarrasService.generarCodigo();
+
+        return ResponseEntity
+        .status(HttpStatus.CREATED)
+        .body(GenerarCodigoBarraResponse.builder()
+            .codigo(codigo)
+            .tipo(CodigoBarrasConstants.TIPO_EAN_13)
+            .build());
     }
 
     @GetMapping("/existe-codigo-barras/{codigoBarras}")

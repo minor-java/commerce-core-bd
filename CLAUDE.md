@@ -28,7 +28,7 @@ The server starts on **port 9092** with context path `/api`.
 
 ## Architecture Overview
 
-Spring Boot 2.4.4 / Java 8 microservice. No migration tool — schema is managed via Hibernate `ddl-auto: update`. Two profiles: `local` (MySQL) and `produccion` (PostgreSQL), configured in `application-local.yml` and `application-produccion.yml`.
+Spring Boot 2.4.4 / Java 8 microservice. Hibernate `ddl-auto: none` in both profiles — there is no migration tool and Hibernate never creates or alters tables. The schema is managed entirely by hand (DDL run manually against the database); any new JPA entity must have its table created manually before use. Two profiles: `local` (MySQL) and `produccion` (PostgreSQL), configured in `application-local.yml` and `application-produccion.yml`.
 
 DTOs (request/response objects) live in an external Maven dependency: **`comun-dto:0.0.1-SNAPSHOT`**. If a DTO class is missing from this repo, it is defined there.
 

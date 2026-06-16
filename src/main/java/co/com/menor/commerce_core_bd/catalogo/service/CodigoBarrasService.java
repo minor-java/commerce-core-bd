@@ -10,6 +10,7 @@ import co.com.menor.comun_dto.codigo_barras.request.EliminarCodigosBarrasRequest
 public interface CodigoBarrasService {
 
     CodigoBarra saveCodigoBarras(CreateCondigoBarrasRequest req);
+    String generarCodigo();
     boolean existsCodigoBarras(String codigoBarras);
     Optional<CodigoBarra> findByCodigo(String codigoBarras);
     List<CodigoBarra> findByProductoId(Long productoId);

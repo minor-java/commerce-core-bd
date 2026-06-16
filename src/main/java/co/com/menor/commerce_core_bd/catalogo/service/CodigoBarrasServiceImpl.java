@@ -1,5 +1,6 @@
 package co.com.menor.commerce_core_bd.catalogo.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,10 +11,14 @@ import org.springframework.stereotype.Service;
 
 import co.com.menor.commerce_core_bd.catalogo.mapper.CodigoBarraMapper;
 import co.com.menor.commerce_core_bd.catalogo.model.CodigoBarra;
+import co.com.menor.commerce_core_bd.catalogo.model.SecuenciaCodigoBarra;
 import co.com.menor.commerce_core_bd.catalogo.repository.CodigoBarraRepository;
+import co.com.menor.commerce_core_bd.catalogo.repository.SecuenciaCodigoBarraRepository;
+import co.com.menor.commerce_core_bd.catalogo.util.Ean13Util;
 import co.com.menor.commerce_core_bd.shared.exception.MinorExcepcion;
 import co.com.menor.comun_dto.codigo_barras.request.CreateCondigoBarrasRequest;
 import co.com.menor.comun_dto.codigo_barras.request.EliminarCodigosBarrasRequest;
+import co.com.menor.comun_dto.utils.CodigoBarrasConstants;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -25,6 +30,9 @@ public class CodigoBarrasServiceImpl implements CodigoBarrasService {
 
     @Autowired
     private CodigoBarraMapper codigoBarraMapper;
+
+    @Autowired
+    private SecuenciaCodigoBarraRepository secuenciaCodigoBarraRepository;
 
     @Override
     public CodigoBarra saveCodigoBarras(CreateCondigoBarrasRequest req) {
@@ -40,6 +48,26 @@ public class CodigoBarrasServiceImpl implements CodigoBarrasService {
             throw new MinorExcepcion(
                 "ERROR",
                 "CodigoBarrasService saveCodigoBarras"
+            );
+        }
+    }
+
+    @Override
+    @Transactional
+    public String generarCodigo() {
+
+        try {
+
+            SecuenciaCodigoBarra secuencia = new SecuenciaCodigoBarra();
+            secuencia.setFechaCreacion(LocalDateTime.now());
+            secuencia = secuenciaCodigoBarraRepository.save(secuencia);
+
+            return Ean13Util.generar(CodigoBarrasConstants.PREFIJO_INTERNO, secuencia.getId());
+        } catch (Exception e) {
+
+            throw new MinorExcepcion(
+                "ERROR",
+                "CodigoBarrasService generarCodigo"
             );
         }
     }

@@ -2,7 +2,7 @@ package co.com.menor.commerce_core_bd.catalogo.util;
 
 public final class Ean13Util {
 
-    private static final int LONGITUD_SECUENCIA = 10;
+    private static final int LONGITUD_SECUENCIA = 9;
 
     private Ean13Util() {}
 

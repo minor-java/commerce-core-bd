@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import co.com.menor.commerce_core_bd.catalogo.mapper.ProductoResponseMapper;
 import co.com.menor.commerce_core_bd.catalogo.model.Producto;
 import co.com.menor.commerce_core_bd.catalogo.service.ProductoService;
+import co.com.menor.commerce_core_bd.shared.exception.MinorExcepcion;
 import co.com.menor.comun_dto.paginacion.PaginadoResponse;
 import co.com.menor.comun_dto.producto.request.CreateProductoRequest;
 import co.com.menor.comun_dto.producto.request.ExistsProductoRequest;
@@ -111,7 +112,11 @@ public class ProductoController {
         .status(HttpStatus.ACCEPTED)
         .body(
             productoResponseMapper.toResponse(
-                productoService.findById(id).get()
+                productoService.findById(id)
+                    .orElseThrow(() -> new MinorExcepcion(
+                        "PRODUCTO_NO_ENCONTRADO",
+                        "El producto con id " + id + " no existe"
+                    ))
             )
         );
     }

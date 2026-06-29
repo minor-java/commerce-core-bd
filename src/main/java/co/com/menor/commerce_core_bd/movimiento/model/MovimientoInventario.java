@@ -44,7 +44,7 @@ public class MovimientoInventario {
     @Column(name = "referencia_tipo", nullable = false, length = 20)
     private String referenciaTipo;
 
-    @Column(name = "referencia_id", nullable = false)
+    @Column(name = "referencia_id")
     private Long referenciaId;
 
     @Column(name = "fecha_creacion", nullable = false)

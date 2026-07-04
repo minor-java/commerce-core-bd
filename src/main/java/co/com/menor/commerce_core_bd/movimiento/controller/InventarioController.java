@@ -1,5 +1,6 @@
 package co.com.menor.commerce_core_bd.movimiento.controller;
 
+import co.com.menor.commerce_core_bd.movimiento.mapper.MovimientoInventarioMapper;
 import co.com.menor.commerce_core_bd.movimiento.service.MovimientoService;
 import co.com.menor.commerce_core_bd.movimiento.service.StockActualService;
 import co.com.menor.comun_dto.caja.request.SumaMovimientoCajaRequest;
@@ -14,6 +15,8 @@ import co.com.menor.comun_dto.paginacion.PaginadoResponse;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -29,8 +32,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class InventarioController {
 
-    private final MovimientoService inventarioService;    
-    private final StockActualService stockActualService;    
+    private final MovimientoService inventarioService;
+    private final StockActualService stockActualService;
+    private final MovimientoInventarioMapper movimientoMapper;    
 
     @GetMapping("/movimiento/{id}")
     public ResponseEntity<MovimientoInventarioResponse> getMovimientoById(@PathVariable Long id) {
@@ -42,6 +46,18 @@ public class InventarioController {
             @PathVariable String tipo,
             @PathVariable Long referenciaId) {
         return ResponseEntity.ok(inventarioService.buscarPorReferenciaYTipo(tipo, referenciaId));
+    }
+
+    @GetMapping("/movimientos-por-referencia/{tipo}/{referenciaId}")
+    public ResponseEntity<List<MovimientoInventarioResponse>> buscarTodosPorReferencia(
+            @PathVariable String tipo,
+            @PathVariable Long referenciaId) {
+        List<MovimientoInventarioResponse> result = inventarioService
+            .buscarTodosPorReferenciaYTipo(tipo, referenciaId)
+            .stream()
+            .map(movimientoMapper::toResponse)
+            .collect(Collectors.toList());
+        return ResponseEntity.ok(result);
     }
 
     @PostMapping("/guardar")

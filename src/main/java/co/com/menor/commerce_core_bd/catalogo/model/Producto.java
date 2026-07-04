@@ -53,4 +53,7 @@ public class Producto {
 
     @Column(name = "precio_venta", nullable = true, precision = 14, scale = 2)
     private BigDecimal precioVenta;
+
+    @Column(name = "area_negocio_id", nullable = false)
+    private Long areaNegocioId;
 }

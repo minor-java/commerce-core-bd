@@ -29,6 +29,7 @@ public class ProductoResponseMapper {
             .usuarioId(producto.getUsuarioId())
             .actualizadoPor(producto.getActualizadoPor())
             .precioVenta(producto.getPrecioVenta())
+            .areaNegocioId(producto.getAreaNegocioId())
         .build();
     }
 
@@ -45,6 +46,7 @@ public class ProductoResponseMapper {
             .usuarioId(producto.getUsuarioId())
             .actualizadoPor(producto.getActualizadoPor())
             .precioVenta(producto.getPrecioVenta())
+            .areaNegocioId(producto.getAreaNegocioId())
             .codigos(codigoBarraResponseMapper.toResponseList(productoConCodigos.getCodigos()))
         .build();
     }

@@ -24,6 +24,7 @@ public class ProductoMapper {
         producto.setFechaCreacion(req.getFechaCreacion());
         producto.setUsuarioId(req.getUsuarioId());
         producto.setPrecioVenta(req.getPrecioVenta());
+        producto.setAreaNegocioId(req.getAreaNegocioId());
 
         return producto;
     }
@@ -52,6 +53,9 @@ public class ProductoMapper {
         }
         if (req.getPrecioVenta() != null) {
             producto.setPrecioVenta(req.getPrecioVenta());
+        }
+        if (req.getAreaNegocioId() != null) {
+            producto.setAreaNegocioId(req.getAreaNegocioId());
         }
     }
 }
